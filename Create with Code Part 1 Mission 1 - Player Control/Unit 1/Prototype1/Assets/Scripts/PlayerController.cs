@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    
+   [SerializeField] public int speed;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,9 +27,9 @@ public class PlayerController : MonoBehaviour
     private void ForwardDrive()
     {
         //Move car forward  on Z axis
-        if (Input.GetKey(KeyCode.W))
+        if (Input.GetKey(KeyCode.UpArrow))
         {
-            gameObject.transform.Translate(Vector3.forward * Time.deltaTime * 20);
+            gameObject.transform.Translate(Vector3.forward * Time.deltaTime * speed);
         }
     }
 }
