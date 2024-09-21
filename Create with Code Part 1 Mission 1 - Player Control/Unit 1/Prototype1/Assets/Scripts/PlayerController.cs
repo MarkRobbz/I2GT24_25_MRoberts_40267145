@@ -5,31 +5,29 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-   [SerializeField] public int speed;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-       
-        
-    }
-
+    private int _speed = 20;
+    private float _turnSpeed = 10f;
+    private float _horizontalInput;
+    private float _verticalInput;
+    
     private void FixedUpdate()
     {
-        ForwardDrive();
+        DriveFoward();
+        DriveTurning();
     }
 
-    private void ForwardDrive()
+    private void DriveFoward()
     {
-        //Move car forward  on Z axis
-        if (Input.GetKey(KeyCode.UpArrow))
-        {
-            gameObject.transform.Translate(Vector3.forward * Time.deltaTime * speed);
-        }
+                //Move car forward  on Z axis
+            _verticalInput = Input.GetAxis("Vertical");
+            transform.Translate(Vector3.forward * Time.deltaTime * _speed * _verticalInput);
+            
+        
+    }
+
+    private void DriveTurning()
+    {
+        _horizontalInput = Input.GetAxis("Horizontal");
+        transform.Rotate(Vector3.up * Time.deltaTime * _turnSpeed * _horizontalInput);
     }
 }
