@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,15 +8,23 @@ public class PlayerController : MonoBehaviour
 
     public float horizontalInput;
     [SerializeField] private float speed = 10f;
+    private int xConstraint = 15;
 
-    
+    [SerializeField] private GameObject projectilePrefab;
+
     void Update()
     {
         PlayerMovement();
-        if (transform.position.x < -15)
+        if (transform.position.x < -xConstraint) {
+            transform.position = new Vector3(-xConstraint, transform.position.y, transform.position.z);
+        } else if(transform.position.x > xConstraint) {
+            transform.position = new Vector3(xConstraint, transform.position.y, transform.position.z);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            //transform.position.Set(-15, transform.position.y, transform.position.z);
-            transform.position = new Vector3(-15, transform.position.y, transform.position.z);
+            Instantiate(projectilePrefab, new Vector3(transform.position.x,
+                transform.position.y,transform.position.z), Quaternion.identity);
         }
         
     }
