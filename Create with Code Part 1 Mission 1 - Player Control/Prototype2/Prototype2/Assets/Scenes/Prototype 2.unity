@@ -479,8 +479,10 @@ MonoBehaviour:
   - {fileID: 286016334728855412, guid: 5c3d209350464ca4ebd1fab05a4a8d23, type: 3}
   - {fileID: 3108733061003150191, guid: b44f77833d679644caa3de38c4de6bbe, type: 3}
   - {fileID: 2041513034601390276, guid: f6f51e6335800d447a43d829d322ae3e, type: 3}
+  spawnInterval: 1
+  spawnDelay: 2
   spawnRangeX: 16
-  spawnRangeZ: 21
+  spawnPosZ: 21
 --- !u!4 &476890142
 Transform:
   m_ObjectHideFlags: 0
@@ -700,7 +702,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   horizontalInput: 0
-  speed: 5
+  speed: 10
   projectilePrefab: {fileID: 4200733546395075914, guid: 54746d9848089dd44b22354a8fd8d9fa, type: 3}
 --- !u!1 &1590138454
 GameObject:
@@ -837,9 +839,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7097660384498050501, guid: 5c3d209350464ca4ebd1fab05a4a8d23, type: 3}
-      propertyPath: _destroyGameObjRange
-      value: 40
+    - target: {fileID: 5732470030398191831, guid: 5c3d209350464ca4ebd1fab05a4a8d23, type: 3}
+      propertyPath: m_Center.y
+      value: 0.11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -911,10 +913,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2901414328592449519, guid: b44f77833d679644caa3de38c4de6bbe, type: 3}
-      propertyPath: _destroyGameObjRange
-      value: 40
-      objectReference: {fileID: 0}
     - target: {fileID: 3108733061003150191, guid: b44f77833d679644caa3de38c4de6bbe, type: 3}
       propertyPath: m_Name
       value: Moose
