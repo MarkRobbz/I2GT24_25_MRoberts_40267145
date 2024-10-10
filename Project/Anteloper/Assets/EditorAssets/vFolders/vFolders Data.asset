@@ -17,10 +17,16 @@ MonoBehaviour:
     - ad067c42f03a848c9b990a5b02b0f06f
     - 8a5b18b63bae843448f51a5ab5096a1d
     - a631300d97eb94b2cadfdf252ec75bd8
+    - 6890f00ef77c6a7459d1c899bba88b07
+    - ae50db0c6e4994946ba36e424108c93c
     values:
     - colorIndex: 1
       iconNameOrGuid: cs Script Icon
     - colorIndex: 4
-      iconNameOrGuid: Prefab Icon
+      iconNameOrGuid: Cubemap Icon
     - colorIndex: 0
       iconNameOrGuid: Settings Icon
+    - colorIndex: 7
+      iconNameOrGuid: 
+    - colorIndex: 8
+      iconNameOrGuid: Material Icon
