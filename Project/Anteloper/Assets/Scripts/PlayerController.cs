@@ -9,7 +9,8 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement Speed")] 
     [SerializeField] private float _walkSpeed = 3.0f;
-
+    [SerializeField] private float _sprintMultiplier = 2.0f;
+    
     [Header("Look Sensitivity")] 
     [SerializeField] private float _mouseSensitivity = 2.0f;
     [SerializeField] private float _lookUpAndDownRange = 80.0f;
@@ -19,6 +20,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private String _verticalMovementInput = "Vertical";
     [SerializeField] private String _lookRotaionXInput = "Mouse X";
     [SerializeField] private String _lookRotaionYInput = "Mouse Y";
+    [SerializeField] private KeyCode _sprintKeyInput = KeyCode.LeftShift;
+    
     
     private float _verticalRotation;
     private Camera mainCamera;
@@ -37,6 +40,7 @@ public class PlayerController : MonoBehaviour
 
     void HandleMovement()
     {
+        float speedMultiplier = Input.GetKey(_sprintKeyInput) ? _sprintMultiplier : 1f;
         float verticalInput = Input.GetAxis(_verticalMovementInput);
         float horizontalInput = Input.GetAxis(_horizontalMovementInput);
 
@@ -50,7 +54,7 @@ public class PlayerController : MonoBehaviour
         
         movement = transform.rotation * movement;
         
-        Vector3 speed = movement * _walkSpeed;
+        Vector3 speed = movement * _walkSpeed * speedMultiplier;
         
         _playerController.SimpleMove(speed);
     }
