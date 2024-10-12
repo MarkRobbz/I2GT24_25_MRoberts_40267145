@@ -155,10 +155,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95cb7d9279f03b24c82c1c2a29f90f38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerController: {fileID: 0}
+  _playerController: {fileID: 649903819}
   _walkSpeed: 3
+  _mouseSensitivity: 2
+  _lookUpAndDownRange: 80
   _horizontalMovementInput: Horizontal
   _verticalMovementInput: Vertical
+  _lookRotaionXInput: Mouse X
+  _lookRotaionYInput: Mouse Y
 --- !u!136 &649903815
 CapsuleCollider:
   m_ObjectHideFlags: 0
