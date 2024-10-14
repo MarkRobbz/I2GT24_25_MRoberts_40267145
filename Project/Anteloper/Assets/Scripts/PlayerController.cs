@@ -9,7 +9,16 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement Speed")] 
     [SerializeField] private float _walkSpeed = 3.0f;
+<<<<<<< Updated upstream
 
+=======
+    [SerializeField] private float _sprintMultiplier = 2.0f;
+
+    [Header("Jumping")] 
+    [SerializeField] private float jumpForce = 5.0f;
+    [SerializeField] private float gravity = 9.81f; //Earths gravity
+    
+>>>>>>> Stashed changes
     [Header("Look Sensitivity")] 
     [SerializeField] private float _mouseSensitivity = 2.0f;
     [SerializeField] private float _lookUpAndDownRange = 80.0f;
@@ -19,14 +28,23 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private String _verticalMovementInput = "Vertical";
     [SerializeField] private String _lookRotaionXInput = "Mouse X";
     [SerializeField] private String _lookRotaionYInput = "Mouse Y";
+<<<<<<< Updated upstream
+=======
+    [SerializeField] private KeyCode _sprintKeyInput = KeyCode.LeftShift;
+    [SerializeField] private KeyCode jumpKey = KeyCode.Space;
+    
+>>>>>>> Stashed changes
     
     private float _verticalRotation;
     private Camera mainCamera;
+    
     
     void Start()
     {
         _playerController = gameObject.GetComponent<CharacterController>();
         mainCamera = Camera.main;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
     
     void Update()
