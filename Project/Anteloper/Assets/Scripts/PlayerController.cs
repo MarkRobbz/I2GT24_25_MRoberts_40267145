@@ -10,6 +10,10 @@ public class PlayerController : MonoBehaviour
     [Header("Movement Speed")] 
     [SerializeField] private float _walkSpeed = 3.0f;
     [SerializeField] private float _sprintMultiplier = 2.0f;
+
+    [Header("Jumping")] 
+    [SerializeField] private float _gravity = 9.18f; //Earths Gravity
+    [SerializeField] private float _jumpingForce = 6.0f;
     
     [Header("Look Sensitivity")] 
     [SerializeField] private float _mouseSensitivity = 2.0f;
@@ -21,21 +25,27 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private String _lookRotaionXInput = "Mouse X";
     [SerializeField] private String _lookRotaionYInput = "Mouse Y";
     [SerializeField] private KeyCode _sprintKeyInput = KeyCode.LeftShift;
+    [SerializeField] private KeyCode _jumpKey = KeyCode.Space;
     
     
     private float _verticalRotation;
-    private Camera mainCamera;
+    private Vector3 _currentMovement = Vector3.zero;
+    private Camera _mainCamera;
+    
+   
     
     void Start()
     {
         _playerController = gameObject.GetComponent<CharacterController>();
-        mainCamera = Camera.main;
+        _mainCamera = Camera.main;
     }
     
     void Update()
     {
         HandleMovement();
         HandleLookRotation();
+        HandleJumpAndGravity();
+        
     }
 
     void HandleMovement()
@@ -43,21 +53,28 @@ public class PlayerController : MonoBehaviour
         float speedMultiplier = Input.GetKey(_sprintKeyInput) ? _sprintMultiplier : 1f;
         float verticalInput = Input.GetAxis(_verticalMovementInput);
         float horizontalInput = Input.GetAxis(_horizontalMovementInput);
-
-        Vector3 movement = new Vector3(horizontalInput, 0, verticalInput);
         
-        // Normalise movement vector if magnitude is greater than 1
+        Vector3 movement = new Vector3(horizontalInput, 0, verticalInput);
+
+        // Normalize the movement vector (to prevent diagonal speed boost)
         if (movement.magnitude > 1f)
         {
             movement.Normalize();
         }
         
+        movement *= _walkSpeed * speedMultiplier;
+        
         movement = transform.rotation * movement;
+
         
-        Vector3 speed = movement * _walkSpeed * speedMultiplier;
+        _currentMovement.x = movement.x;
+        _currentMovement.z = movement.z;
         
-        _playerController.SimpleMove(speed);
+        
+        
+        _playerController.Move(_currentMovement * Time.deltaTime);
     }
+    
 
     void HandleLookRotation()
     {
@@ -66,6 +83,27 @@ public class PlayerController : MonoBehaviour
         
         _verticalRotation -= Input.GetAxis(_lookRotaionYInput) * _mouseSensitivity ;
         _verticalRotation = Mathf.Clamp(_verticalRotation, -_lookUpAndDownRange, _lookUpAndDownRange); //Clamp looking up and down
-        mainCamera.transform.localRotation = Quaternion.Euler(_verticalRotation,0,0);
+        _mainCamera.transform.localRotation = Quaternion.Euler(_verticalRotation,0,0);
     }
+
+   
+
+    void HandleJumpAndGravity()
+    {
+        if (_playerController.isGrounded)
+        {
+            _currentMovement.y = -0.5f; //Resets player velocty to keep them grounded
+            
+            if (Input.GetKeyDown(_jumpKey))
+            {
+                _currentMovement.y = _jumpingForce;
+            }
+        }
+        else
+        {
+            _currentMovement.y -= _gravity * Time.deltaTime; //Applies gravity
+        }
+    }
+
+    
 }
