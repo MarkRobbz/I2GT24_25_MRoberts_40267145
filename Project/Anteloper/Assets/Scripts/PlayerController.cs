@@ -38,6 +38,8 @@ public class PlayerController : MonoBehaviour
     {
         _playerController = gameObject.GetComponent<CharacterController>();
         _mainCamera = Camera.main;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
     
     void Update()
@@ -45,7 +47,6 @@ public class PlayerController : MonoBehaviour
         HandleMovement();
         HandleLookRotation();
         HandleJumpAndGravity();
-        
     }
 
     void HandleMovement()
@@ -92,7 +93,7 @@ public class PlayerController : MonoBehaviour
     {
         if (_playerController.isGrounded)
         {
-            _currentMovement.y = -0.5f; //Resets player velocty to keep them grounded
+            _currentMovement.y = -0.5f; //Resets player velocity to keep them grounded
             
             if (Input.GetKeyDown(_jumpKey))
             {
