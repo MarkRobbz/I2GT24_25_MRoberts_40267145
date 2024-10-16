@@ -2,57 +2,82 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.UI;
+using Sirenix.OdinInspector;
 
 public class Health : MonoBehaviour
 {
-    [SerializeField] public float _currentHealth;
+    [SerializeField] public float currentHealth;
     [SerializeField] public float maxHealth;
 
     public event Action<float> OnHealthChanged;
 
     private void Start()
     {
-        _currentHealth = maxHealth;
+        currentHealth = maxHealth;
+        OnHealthChanged.Invoke(currentHealth);
+        
     }
 
-    private void Update()
+    
+    public void IncreaseHealth(float healthPoints)
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (currentHealth < maxHealth)
         {
-            DecreaseHealth(10);
-        }
-    }
-
-    private void IncreaseHealth(float healthPoints)
-    {
-        if (_currentHealth < maxHealth)
-        {
-            if (healthPoints > maxHealth)
+            currentHealth += healthPoints;
+            if (currentHealth > maxHealth)
             {
-                _currentHealth = maxHealth;
+                currentHealth = maxHealth;
             }
-            _currentHealth = healthPoints;
+            OnHealthChanged?.Invoke(currentHealth);
         }
     }
 
-    private void DecreaseHealth(float healthPoints)
+    public void DecreaseHealth(float healthPoints)
     {
-        if (healthPoints >= _currentHealth)
+        if (healthPoints >= currentHealth)
         {
             Die();
         }
         else
         {
-            _currentHealth -= healthPoints;
-            OnHealthChanged.Invoke(_currentHealth);
+            currentHealth -= healthPoints;
+            OnHealthChanged?.Invoke(currentHealth);
         }
     }
 
-    void Die()
+    private void Die()
     {
-        _currentHealth = 0;
-        Debug.Log("Dead! Current Health: " + _currentHealth);
+        currentHealth = 0;
+        OnHealthChanged?.Invoke(currentHealth);
+        Debug.Log("DEAD! Current Health: " + currentHealth);
+    }
+
+    
+    
+    
+    
+    
+    
+    //============ Test methods for the Inspector =============
+
+    [Space(20)]
+    [ShowInInspector]
+    private float healthTestAmount = 10f; 
+
+    // Group the buttons horizontally
+    [HorizontalGroup("HealthButtons", Width = 100)] 
+    [Button("Increase Health (Test)"), GUIColor(0.3f, 0.9f, 0.3f)] 
+    private void TestIncreaseHealth()
+    {
+        IncreaseHealth(healthTestAmount);
+        Debug.Log("Health increased by: " + healthTestAmount);
+    }
+
+    [HorizontalGroup("HealthButtons", Width = 100)] 
+    [Button("Decrease Health (Test)"), GUIColor(0.9f, 0.3f, 0.3f)] 
+    private void TestDecreaseHealth()
+    {
+        DecreaseHealth(healthTestAmount);
+        Debug.Log("Health decreased by: " + healthTestAmount);
     }
 }

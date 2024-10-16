@@ -17,7 +17,7 @@ public class HealthBarUI : MonoBehaviour
         _healthBarSlider = gameObject.GetComponentInChildren<Slider>();
         _healthBarSlider.maxValue = _playerHealth.maxHealth;
         _healthBarSlider.minValue = 0;
-        UpdateHealthBar(_playerHealth._currentHealth);
+        UpdateHealthBar(_playerHealth.currentHealth);
         
         _playerHealth.OnHealthChanged += UpdateHealthBar; //Sub
 
