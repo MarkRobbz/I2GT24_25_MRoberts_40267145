@@ -48,6 +48,7 @@ public class Health : MonoBehaviour
             UpdateHealthUI();
         
     }
+    
 
     public void DecreaseHealth(float healthPoints)
     {
@@ -60,6 +61,48 @@ public class Health : MonoBehaviour
         }
         
     }
+    
+    
+    public void ChangeHealthOverTime(float healthPoints, float duration, bool isIncrease)
+    {
+        StartCoroutine(ChangeHealthCoroutine(healthPoints, duration, isIncrease));
+    }
+
+    
+    private IEnumerator ChangeHealthCoroutine(float healthPoints, float duration, bool isIncrease)
+    {
+        float elapsedTime = 0f;
+        float amountPerSecond = healthPoints / duration;
+
+        while (elapsedTime < duration)
+        {
+            float deltaTime = Time.deltaTime;
+            float healthChange = amountPerSecond * deltaTime;
+
+            if (isIncrease)
+            {
+                IncreaseHealth(healthChange); 
+            }
+            else
+            {
+                DecreaseHealth(healthChange); 
+            }
+
+            elapsedTime += deltaTime;
+            yield return null;
+        }
+
+        
+        if (isIncrease)
+        {
+            IncreaseHealth(healthPoints); 
+        }
+        else
+        {
+            DecreaseHealth(healthPoints); 
+        }
+    }
+
 
     private void Die()
     {
