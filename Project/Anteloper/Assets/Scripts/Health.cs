@@ -36,9 +36,7 @@ public class Health : MonoBehaviour
     
     private void Start()
     {
-        _currentHealth = _maxHealth;
         UpdateHealthUI();
-        
     }
 
     
