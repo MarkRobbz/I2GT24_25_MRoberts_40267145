@@ -6,50 +6,71 @@ using Sirenix.OdinInspector;
 
 public class Health : MonoBehaviour
 {
-    [SerializeField] public float currentHealth;
-    [SerializeField] public float maxHealth;
+    [SerializeField] private float _currentHealth;
+    [SerializeField] private float _maxHealth;
 
     public event Action<float> OnHealthChanged;
+    
+    
+    public float CurrentHealth
+    {
+        get { return _currentHealth; }
+        private set
+        {
+            _currentHealth = Mathf.Clamp(value, 0, _maxHealth);
+            UpdateHealthUI();
+        }
+    }
+    public float MaxHealth
+    {
+        get { return _maxHealth; }
+        set
+        {
+            if (value > 0)
+            {
+                _maxHealth = value;
+            }
+        }
+    }
 
+    
     private void Start()
     {
-        currentHealth = maxHealth;
-        OnHealthChanged.Invoke(currentHealth);
+        _currentHealth = _maxHealth;
+        UpdateHealthUI();
         
     }
 
     
     public void IncreaseHealth(float healthPoints)
     {
-        if (currentHealth < maxHealth)
-        {
-            currentHealth += healthPoints;
-            if (currentHealth > maxHealth)
-            {
-                currentHealth = maxHealth;
-            }
-            OnHealthChanged?.Invoke(currentHealth);
-        }
+            _currentHealth = Mathf.Clamp(_currentHealth + healthPoints, 0, _maxHealth);
+            UpdateHealthUI();
+        
     }
 
     public void DecreaseHealth(float healthPoints)
     {
-        if (healthPoints >= currentHealth)
+        _currentHealth = Mathf.Clamp(_currentHealth - healthPoints, 0, _maxHealth);
+        UpdateHealthUI();
+        
+        if ( _currentHealth <= 0)
         {
             Die();
         }
-        else
-        {
-            currentHealth -= healthPoints;
-            OnHealthChanged?.Invoke(currentHealth);
-        }
+        
     }
 
     private void Die()
     {
-        currentHealth = 0;
-        OnHealthChanged?.Invoke(currentHealth);
-        Debug.Log("DEAD! Current Health: " + currentHealth);
+        _currentHealth = 0;
+        UpdateHealthUI();
+        Debug.Log("DEAD! Current Health: " + _currentHealth);
+    }
+
+    public void UpdateHealthUI()
+    {
+        OnHealthChanged?.Invoke(_currentHealth);
     }
 
     
@@ -58,7 +79,7 @@ public class Health : MonoBehaviour
     
     
     
-    //============ Test methods for the Inspector =============
+    //============ Test methods Inspector =============
 
     [Space(20)]
     [ShowInInspector]
@@ -70,7 +91,7 @@ public class Health : MonoBehaviour
     private void TestIncreaseHealth()
     {
         IncreaseHealth(healthTestAmount);
-        Debug.Log("Health increased by: " + healthTestAmount);
+        Debug.Log("Test-Health increased by: " + healthTestAmount);
     }
 
     [HorizontalGroup("HealthButtons", Width = 100)] 
@@ -78,6 +99,6 @@ public class Health : MonoBehaviour
     private void TestDecreaseHealth()
     {
         DecreaseHealth(healthTestAmount);
-        Debug.Log("Health decreased by: " + healthTestAmount);
+        Debug.Log("Test-Health decreased by: " + healthTestAmount);
     }
 }
