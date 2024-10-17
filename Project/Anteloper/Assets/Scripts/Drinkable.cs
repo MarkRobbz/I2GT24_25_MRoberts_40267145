@@ -5,7 +5,7 @@ using UnityEngine;
 public class Drinkable : Item
 {
     //private Health _playerHealth;
-    private int restoreAmount;
+    private float _restoreAmount;
     
     
 
@@ -14,7 +14,7 @@ public class Drinkable : Item
         HungerAndThirst playerHunger = FindObjectOfType<HungerAndThirst>();
         if (playerHunger != null)
         {
-            playerHunger.RestoreThirst(restoreAmount);
+            playerHunger.RestoreThirst(_restoreAmount);
         }
         
         //DestroyItem();

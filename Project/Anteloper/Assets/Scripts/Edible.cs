@@ -5,7 +5,7 @@ using UnityEngine;
 public class Edible : Item
 {
     //private Health _playerHealth;
-    private int restoreAmount;
+    private float _restoreAmount;
     public FoodType foodType; 
     
     public enum FoodType
@@ -21,15 +21,15 @@ public class Edible : Item
         switch (foodType)
         {
             case FoodType.Sap:
-                restoreAmount = 10;
+                _restoreAmount = 10;
                 itemName = "Sap";
                 break;
             case FoodType.Mushroom:
-                restoreAmount = 20;
+                _restoreAmount = 20;
                 itemName = "Mushroom";
                 break;
             default:
-                restoreAmount = 0;
+                _restoreAmount = 0;
                 itemName = "Unknown Food";
                 break;
         }
@@ -40,7 +40,7 @@ public class Edible : Item
         HungerAndThirst playerHunger = FindObjectOfType<HungerAndThirst>();
         if (playerHunger != null)
         {
-            playerHunger.RestoreHunger(restoreAmount);
+            playerHunger.RestoreHunger(_restoreAmount);
         }
         
         DestroyItem();
