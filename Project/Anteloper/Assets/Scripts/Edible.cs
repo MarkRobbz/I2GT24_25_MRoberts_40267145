@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Food : Item
+public class Edible : Item
 {
     //private Health _playerHealth;
     private int restoreAmount;
@@ -37,6 +37,12 @@ public class Food : Item
 
     public override void Use()
     {
+        HungerAndThirst playerHunger = FindObjectOfType<HungerAndThirst>();
+        if (playerHunger != null)
+        {
+            playerHunger.RestoreHunger(restoreAmount);
+        }
         
+        DestroyItem();
     }
 }
