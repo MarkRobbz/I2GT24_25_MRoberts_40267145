@@ -29,6 +29,7 @@ public class Health : MonoBehaviour
             if (value > 0)
             {
                 _maxHealth = value;
+                UpdateHealthUI();
             }
         }
     }
