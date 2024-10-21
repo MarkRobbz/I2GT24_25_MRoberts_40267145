@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CraftableItem : MonoBehaviour
+public class CraftableItem : MonoBehaviour, IUsable
 {
     // Start is called before the first frame update
     void Start()
@@ -15,4 +15,10 @@ public class CraftableItem : MonoBehaviour
     {
         
     }
+
+    public void Use()
+    {
+        
+    }
+    
 }
