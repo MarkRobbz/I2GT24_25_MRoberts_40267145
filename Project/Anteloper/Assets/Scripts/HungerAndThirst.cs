@@ -75,13 +75,13 @@ public class HungerAndThirst : MonoBehaviour
    
    public void RestoreThirst(float thirstAmount)
    {
-       _currentThirst = Math.Clamp(_currentHunger + thirstAmount, 0, _maxHunger);
+       _currentThirst = Math.Clamp(_currentThirst + thirstAmount, 0, _maxThirst);
        UpdateThirstUI();
    }
    
    public void AbolishThirst(float thirstAmount)
    {
-       _currentThirst = Math.Clamp(_currentHunger -= thirstAmount, 0, _maxHunger);
+       _currentThirst = Math.Clamp(_currentThirst -= thirstAmount, 0, _maxThirst);
        UpdateThirstUI();
    }
 
@@ -130,7 +130,7 @@ public class HungerAndThirst : MonoBehaviour
    [Button("Restore Thirst (Test)"), GUIColor(0.3f, 0.9f, 0.3f)] 
    private void TestRestoreThirst()
    {
-       RestoreHunger(thirstTestAmount);
+       RestoreThirst(thirstTestAmount);
        Debug.Log("Test-Thirst increased by: " + thirstTestAmount);
    }
 
@@ -138,7 +138,7 @@ public class HungerAndThirst : MonoBehaviour
    [Button("Decrease Thirst (Test)"), GUIColor(0.9f, 0.3f, 0.3f)] 
    private void TestAbolishThirst()
    {
-       AbolishHunger(thirstTestAmount);
+       AbolishThirst(thirstTestAmount);
        Debug.Log("Test-Thirst decreased by: " + thirstTestAmount);
    }
 
