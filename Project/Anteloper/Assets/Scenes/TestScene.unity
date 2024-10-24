@@ -1649,7 +1649,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbcb0a0e7a88d424f9a1ccb777dccf96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inventoryCanvas: {fileID: 1560482359}
+  inventoryUI: {fileID: 752874457}
   slotPrefab: {fileID: 4061412069087883585, guid: 7ffa9fe6819724bd381cc39b0704108e,
     type: 3}
   inventoryGrid: {fileID: 752874458}
