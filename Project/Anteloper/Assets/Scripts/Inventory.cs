@@ -11,7 +11,8 @@ public class Inventory : MonoBehaviour
     public int quickAccessSlotCount = 8; 
     public List<InventorySlot> inventorySlots = new List<InventorySlot>();
     public List<InventorySlot> quickAccessSlots = new List<InventorySlot>();
-
+    
+    public event Action onInventoryChanged;
 
     private void Awake()
     {
@@ -38,25 +39,44 @@ public class Inventory : MonoBehaviour
     
     public bool AddItem(BaseItem item, int count)
     {
-        foreach (var slot in inventorySlots)
+        
+        foreach (var slot in inventorySlots) //First try stack item
         {
-            if (slot.AddItem(item, count))
+            if (!slot.IsEmpty() && slot.item == item && slot.itemCount < item.maxStackSize)
             {
-                return true;
+                int availableSpace = item.maxStackSize - slot.itemCount;
+                int amountToAdd = Mathf.Min(count, availableSpace);
+                slot.itemCount += amountToAdd;
+                count -= amountToAdd;
+                Debug.Log($"Stacked {amountToAdd} of {item.itemName} to existing slot.");
+                onInventoryChanged?.Invoke();
+                if (count <= 0)
+                {
+                    return true;
+                }
             }
         }
 
         
-        foreach (var slot in inventorySlots) //Try find emoty slot
+        foreach (var slot in inventorySlots)
         {
             if (slot.IsEmpty())
             {
-                slot.AddItem(item, count);
-                return true;
+                int amountToAdd = Mathf.Min(count, item.maxStackSize);
+                slot.item = item;
+                slot.itemCount = amountToAdd;
+                count -= amountToAdd;
+                Debug.Log($"Added {amountToAdd} of {item.itemName} to new slot.");
+                onInventoryChanged?.Invoke();
+                if (count <= 0)
+                {
+                    return true;
+                }
             }
         }
 
-        return false; // Inventory is full
+        Debug.Log("Inventory is full!");
+        return false;
     }
 
     

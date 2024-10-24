@@ -9,13 +9,15 @@ public class InventoryUI : MonoBehaviour
     public GameObject slotPrefab;       
     public Transform inventoryGrid;     
     public Transform quickAccessGrid;   
-
-    private Inventory _inventory;        
+    private Inventory _inventory;   
+    
+    
 
     void Start()
     {
         //Debug.Log("Inventory UI Start Method Called");
         _inventory = FindObjectOfType<Inventory>();  
+        _inventory.onInventoryChanged += UpdateUI; 
         PopulateInventoryUI();
         PopulateQuickAccessUI();
         
@@ -32,24 +34,21 @@ public class InventoryUI : MonoBehaviour
     
     void PopulateInventoryUI()
     {
-        //Debug.Log("Populating Inventory UI");
-
         foreach (Transform child in inventoryGrid)
         {
-            Destroy(child.gameObject);  // Clear previous slots (if any)
+            Destroy(child.gameObject);  // Clear previous slots
         }
 
         int slotIndex = 0;
         foreach (InventorySlot slot in _inventory.inventorySlots)
         {
-            Debug.Log($"Creating Inventory Slot {slotIndex + 1}");
             GameObject newSlotGO = Instantiate(slotPrefab, inventoryGrid);
             SlotUI slotUI = newSlotGO.GetComponent<SlotUI>();
             slotUI.UpdateSlotUI(slot);
             slotIndex++;
         }
 
-        //Debug.Log("Total Inventory Slots Created: " + slotIndex);
+        Debug.Log("Total Inventory Slots Created: " + slotIndex);
     }
 
     
@@ -68,6 +67,21 @@ public class InventoryUI : MonoBehaviour
             GameObject newSlotGO = Instantiate(slotPrefab, quickAccessGrid);
             SlotUI slotUI = newSlotGO.GetComponent<SlotUI>();
             slotUI.UpdateSlotUI(slot);
+        }
+    }
+    
+    void UpdateUI()
+    {
+        Debug.Log("Updating Inventory UI.");
+        PopulateInventoryUI();
+        PopulateQuickAccessUI();
+    }
+
+    void OnDestroy()
+    {
+        if (_inventory != null)
+        {
+            _inventory.onInventoryChanged -= UpdateUI; 
         }
     }
 }

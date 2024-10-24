@@ -13,15 +13,11 @@ public class InventorySlot
 
     public bool AddItem(BaseItem newItem, int count)
     {
-        if (item == null)
+        if (item != null && item == newItem && itemCount < item.maxStackSize)
         {
-            item = newItem;
-            itemCount = count;
-            return true;
-        }
-        else if (item == newItem && itemCount + count <= item.maxStackSize)
-        {
-            itemCount += count;
+            int availableSpace = item.maxStackSize - itemCount;
+            int amountToAdd = Mathf.Min(count, availableSpace);
+            itemCount += amountToAdd;
             return true;
         }
         return false;
