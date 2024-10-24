@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: SapItem
   m_EditorClassIdentifier: 
   itemName: Sap
-  itemIcon: {fileID: 0}
+  itemIcon: {fileID: 21300000, guid: 3aedbcb25bd604a6ab1a76c03544abd0, type: 3}
   maxStackSize: 60
   restoreAmount: 10

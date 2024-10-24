@@ -39,66 +39,106 @@ public class Inventory : MonoBehaviour
     
     public bool AddItem(BaseItem item, int count)
     {
-        
-        foreach (var slot in inventorySlots) //First try stack item
+        // try to add to quick access slots first
+        int remainingCount = count;
+        remainingCount = AddToQuickAccess(item, remainingCount);
+
+        // If any reaming add to inventory
+        if (remainingCount > 0)
         {
-            if (!slot.IsEmpty() && slot.item == item && slot.itemCount < item.maxStackSize)
-            {
-                int availableSpace = item.maxStackSize - slot.itemCount;
-                int amountToAdd = Mathf.Min(count, availableSpace);
-                slot.itemCount += amountToAdd;
-                count -= amountToAdd;
-                Debug.Log($"Stacked {amountToAdd} of {item.itemName} to existing slot.");
-                onInventoryChanged?.Invoke();
-                if (count <= 0)
-                {
-                    return true;
-                }
-            }
+            remainingCount = AddToInventorySlots(item, remainingCount);
+        }
+        
+        if (remainingCount > 0)
+        {
+            Debug.Log("Inventory is full!");
+            return false;
         }
 
-        
-        foreach (var slot in inventorySlots)
-        {
-            if (slot.IsEmpty())
-            {
-                int amountToAdd = Mathf.Min(count, item.maxStackSize);
-                slot.item = item;
-                slot.itemCount = amountToAdd;
-                count -= amountToAdd;
-                Debug.Log($"Added {amountToAdd} of {item.itemName} to new slot.");
-                onInventoryChanged?.Invoke();
-                if (count <= 0)
-                {
-                    return true;
-                }
-            }
-        }
-
-        Debug.Log("Inventory is full!");
-        return false;
+        onInventoryChanged?.Invoke();
+        return true;
     }
 
     
-    public bool AddToQuickAccess(BaseItem item, int count)
+private int AddToQuickAccess(BaseItem item, int count)
+{
+    int remainingCount = count;
+
+    
+    foreach (var slot in quickAccessSlots) //Try to stack first
     {
-        foreach (var slot in quickAccessSlots)
+        if (!slot.IsEmpty() && slot.item == item && slot.itemCount < item.maxStackSize)
         {
-            if (slot.AddItem(item, count))
+            int spaceLeft = item.maxStackSize - slot.itemCount;
+            int amountToAdd = Mathf.Min(remainingCount, spaceLeft);
+            slot.itemCount += amountToAdd;
+            remainingCount -= amountToAdd;
+
+            if (remainingCount <= 0)
             {
-                return true;
+                return 0;
             }
         }
-
-        foreach (var slot in quickAccessSlots)
-        {
-            if (slot.IsEmpty())
-            {
-                slot.AddItem(item, count);
-                return true;
-            }
-        }
-
-        return false; // Quick-access bar full
     }
+
+    
+    foreach (var slot in quickAccessSlots) //Add to empty slot
+    {
+        if (slot.IsEmpty())
+        {
+            int amountToAdd = Mathf.Min(remainingCount, item.maxStackSize);
+            slot.item = item;
+            slot.itemCount = amountToAdd;
+            remainingCount -= amountToAdd;
+
+            if (remainingCount <= 0)
+            {
+                return 0;
+            }
+        }
+    }
+
+    return remainingCount;
+}
+
+private int AddToInventorySlots(BaseItem item, int count)
+{
+    int remainingCount = count;
+
+    
+    foreach (var slot in inventorySlots) //Try to stack
+    {
+        if (!slot.IsEmpty() && slot.item == item && slot.itemCount < item.maxStackSize)
+        {
+            int spaceLeft = item.maxStackSize - slot.itemCount;
+            int amountToAdd = Mathf.Min(remainingCount, spaceLeft);
+            slot.itemCount += amountToAdd;
+            remainingCount -= amountToAdd;
+
+            if (remainingCount <= 0)
+            {
+                return 0;
+            }
+        }
+    }
+
+    
+    foreach (var slot in inventorySlots) //Add empty slots
+    {
+        if (slot.IsEmpty())
+        {
+            int amountToAdd = Mathf.Min(remainingCount, item.maxStackSize);
+            slot.item = item;
+            slot.itemCount = amountToAdd;
+            remainingCount -= amountToAdd;
+
+            if (remainingCount <= 0)
+            {
+                return 0;
+            }
+        }
+    }
+
+    return remainingCount;
+}
 }

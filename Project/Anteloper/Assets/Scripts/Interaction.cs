@@ -79,7 +79,7 @@ public class Interaction : MonoBehaviour
                 {
                     if (itemPickup.item is ConsumableItem)
                     {
-                        _interactionUI.text = "Press E to Pickup, Hold E to Consume";
+                        _interactionUI.text = "E to Pickup, Hold to Consume";
                     }
                     else
                     {

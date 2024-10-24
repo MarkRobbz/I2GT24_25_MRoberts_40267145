@@ -5,83 +5,95 @@ using TMPro;
 
 public class InventoryUI : MonoBehaviour
 {
-    public GameObject inventoryCanvas;  
-    public GameObject slotPrefab;       
-    public Transform inventoryGrid;     
-    public Transform quickAccessGrid;   
-    private Inventory _inventory;   
-    
-    
+    public GameObject inventoryUI;
+    public GameObject slotPrefab;
+    public Transform inventoryGrid;
+    public Transform quickAccessGrid;
+
+    private Inventory _inventory;
+
+    private List<SlotUI> inventorySlotUIs = new List<SlotUI>();
+    private List<SlotUI> quickAccessSlotUIs = new List<SlotUI>();
 
     void Start()
     {
-        //Debug.Log("Inventory UI Start Method Called");
-        _inventory = FindObjectOfType<Inventory>();  
-        _inventory.onInventoryChanged += UpdateUI; 
-        PopulateInventoryUI();
-        PopulateQuickAccessUI();
-        
+        inventoryUI.SetActive(!inventoryUI.activeSelf);
+        _inventory = FindObjectOfType<Inventory>();
+        _inventory.onInventoryChanged += UpdateUI;
+
+        InitialiseInventoryUI();
+        InitialiseQuickAccessUI();
+    }
+
+    private void InitialiseInventoryUI()
+    {
+        foreach (Transform child in inventoryGrid)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (InventorySlot slot in _inventory.inventorySlots)
+        {
+            GameObject newSlotGO = Instantiate(slotPrefab, inventoryGrid);
+            SlotUI slotUI = newSlotGO.GetComponent<SlotUI>();
+            inventorySlotUIs.Add(slotUI);
+        }
+
+        UpdateInventoryUI();
+    }
+
+    private void InitialiseQuickAccessUI()
+    {
+        foreach (Transform child in quickAccessGrid)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (InventorySlot slot in _inventory.quickAccessSlots)
+        {
+            GameObject newSlotGO = Instantiate(slotPrefab, quickAccessGrid);
+            SlotUI slotUI = newSlotGO.GetComponent<SlotUI>();
+            quickAccessSlotUIs.Add(slotUI);
+        }
+
+        UpdateQuickAccessUI();
+    }
+
+    void UpdateUI()
+    {
+        UpdateInventoryUI();
+        UpdateQuickAccessUI();
+    }
+
+    void UpdateInventoryUI()
+    {
+        for (int i = 0; i < _inventory.inventorySlots.Count; i++)
+        {
+            inventorySlotUIs[i].UpdateSlotUI(_inventory.inventorySlots[i]);
+        }
+    }
+
+    void UpdateQuickAccessUI()
+    {
+        for (int i = 0; i < _inventory.quickAccessSlots.Count; i++)
+        {
+            quickAccessSlotUIs[i].UpdateSlotUI(_inventory.quickAccessSlots[i]);
+        }
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.I))
         {
-            inventoryCanvas.SetActive(!inventoryCanvas.activeSelf);
+            inventoryUI.SetActive(!inventoryUI.activeSelf);
         }
-    }
-
-    
-    void PopulateInventoryUI()
-    {
-        foreach (Transform child in inventoryGrid)
-        {
-            Destroy(child.gameObject);  // Clear previous slots
-        }
-
-        int slotIndex = 0;
-        foreach (InventorySlot slot in _inventory.inventorySlots)
-        {
-            GameObject newSlotGO = Instantiate(slotPrefab, inventoryGrid);
-            SlotUI slotUI = newSlotGO.GetComponent<SlotUI>();
-            slotUI.UpdateSlotUI(slot);
-            slotIndex++;
-        }
-
-        Debug.Log("Total Inventory Slots Created: " + slotIndex);
-    }
-
-    
-    void PopulateQuickAccessUI()
-    {
-        //Debug.Log("Populating Quick Access UI");
-
-        foreach (Transform child in quickAccessGrid)
-        {
-            Destroy(child.gameObject);  // Clear previous slots (if any)
-        }
-
-        foreach (InventorySlot slot in _inventory.quickAccessSlots)
-        {
-           // Debug.Log("Creating Quick Access Slot");
-            GameObject newSlotGO = Instantiate(slotPrefab, quickAccessGrid);
-            SlotUI slotUI = newSlotGO.GetComponent<SlotUI>();
-            slotUI.UpdateSlotUI(slot);
-        }
-    }
-    
-    void UpdateUI()
-    {
-        Debug.Log("Updating Inventory UI.");
-        PopulateInventoryUI();
-        PopulateQuickAccessUI();
     }
 
     void OnDestroy()
     {
         if (_inventory != null)
         {
-            _inventory.onInventoryChanged -= UpdateUI; 
+            _inventory.onInventoryChanged -= UpdateUI;
         }
     }
 }
