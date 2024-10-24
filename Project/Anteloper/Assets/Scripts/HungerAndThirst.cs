@@ -61,29 +61,18 @@ public class HungerAndThirst : MonoBehaviour
         }
     }
 
-   public void RestoreHunger(float hungerAmount)
-   {
-       _currentHunger = Math.Clamp(_currentHunger + hungerAmount, 0, _maxHunger);
-       UpdateHungerUI();
-   }
-   
-   public void AbolishHunger(float hungerAmount)
-   {
-       _currentHunger = Math.Clamp(_currentHunger -= hungerAmount, 0, _maxHunger);
-       UpdateHungerUI();
-   }
-   
-   public void RestoreThirst(float thirstAmount)
-   {
-       _currentThirst = Math.Clamp(_currentThirst + thirstAmount, 0, _maxThirst);
-       UpdateThirstUI();
-   }
-   
-   public void AbolishThirst(float thirstAmount)
-   {
-       _currentThirst = Math.Clamp(_currentThirst -= thirstAmount, 0, _maxThirst);
-       UpdateThirstUI();
-   }
+
+    public void ModifyHunger(float amount)
+    {
+        _currentHunger = Mathf.Clamp(_currentHunger + amount, 0, _maxHunger);
+        UpdateHungerUI();
+    }
+
+    public void ModifyThirst(float amount)
+    {
+        _currentThirst = Mathf.Clamp(_currentThirst + amount, 0, _maxThirst);
+        UpdateThirstUI();
+    }
 
    public void UpdateHungerUI()
    {
@@ -105,15 +94,15 @@ public class HungerAndThirst : MonoBehaviour
    [Button("Restore Hunger (Test)"), GUIColor(0.3f, 0.9f, 0.3f)] 
    private void TestRestoreHunger()
    {
-       RestoreHunger(hungerTestAmount);
+       ModifyHunger(hungerTestAmount);
        Debug.Log("Test-Hunger increased by: " + hungerTestAmount);
    }
 
    [HorizontalGroup("HungerGroup/Buttons", Width = 150)]
    [Button("Decrease Hunger (Test)"), GUIColor(0.9f, 0.3f, 0.3f)] 
-   private void TestAbolishHunger()
+   private void TestReduceHunger()
    {
-       AbolishHunger(hungerTestAmount);
+       ModifyHunger(-hungerTestAmount);
        Debug.Log("Test-Hunger decreased by: " + hungerTestAmount);
    }
 
@@ -130,15 +119,15 @@ public class HungerAndThirst : MonoBehaviour
    [Button("Restore Thirst (Test)"), GUIColor(0.3f, 0.9f, 0.3f)] 
    private void TestRestoreThirst()
    {
-       RestoreThirst(thirstTestAmount);
+       ModifyThirst(thirstTestAmount);
        Debug.Log("Test-Thirst increased by: " + thirstTestAmount);
    }
 
    [HorizontalGroup("ThirstGroup/Buttons", Width = 150)]
    [Button("Decrease Thirst (Test)"), GUIColor(0.9f, 0.3f, 0.3f)] 
-   private void TestAbolishThirst()
+   private void TestReduceThirst()
    {
-       AbolishThirst(thirstTestAmount);
+       ModifyThirst(-thirstTestAmount);
        Debug.Log("Test-Thirst decreased by: " + thirstTestAmount);
    }
 

@@ -1,10 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 
-using System.Collections.Generic;
-using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
@@ -13,23 +12,27 @@ public class Inventory : MonoBehaviour
     public List<InventorySlot> inventorySlots = new List<InventorySlot>();
     public List<InventorySlot> quickAccessSlots = new List<InventorySlot>();
 
-    private void Start()
+
+    private void Awake()
     {
-        InitializeInventory();
+        InitialiseInventory();
     }
 
     
-    private void InitializeInventory()
+    
+    private void InitialiseInventory()
     {
         for (int i = 0; i < inventorySlotCount; i++)
         {
             inventorySlots.Add(new InventorySlot());
         }
+        //Debug.Log("Inventory Slots Initialised: " + inventorySlots.Count);
 
         for (int i = 0; i < quickAccessSlotCount; i++)
         {
             quickAccessSlots.Add(new InventorySlot());
         }
+        //debug.Log("Quick Access Slots Initialised: " + quickAccessSlots.Count);
     }
 
     

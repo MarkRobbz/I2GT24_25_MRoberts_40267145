@@ -10,7 +10,10 @@ public class Interaction : MonoBehaviour
     [SerializeField] private LayerMask _interactableLayer = 1 << 8;
     [SerializeField] private TextMeshProUGUI _interactionUI;
     
+    
     [SerializeField] private KeyCode _interactKey = KeyCode.E;
+    [SerializeField] private float _holdThreshold = 0.5f; // Time in seconds considered as hold
+    private float _interactKeyHoldTime = 0f;
 
     private IUsable _currentUsable;
     private int _frameCount = 0;
@@ -38,9 +41,22 @@ public class Interaction : MonoBehaviour
             DetectInteractableObject();
         }
 
-        if (Input.GetKeyDown(_interactKey) && _currentUsable != null)
+        if (Input.GetKeyDown(_interactKey))
         {
-            _currentUsable.Use();
+            _interactKeyHoldTime = 0f;
+            Debug.Log("Key Down detected");
+        }
+        if (Input.GetKey(_interactKey))
+        {
+            _interactKeyHoldTime += Time.deltaTime;
+            Debug.Log("Key Held, Hold Time: " + _interactKeyHoldTime);
+        }
+        if (Input.GetKeyUp(_interactKey))
+        {
+            bool isHold = _interactKeyHoldTime >= _holdThreshold;
+            Debug.Log("Key Up detected, isHold: " + isHold);
+            _currentUsable.Use(isHold);
+            _interactKeyHoldTime = 0f;
         }
     }
     
@@ -50,7 +66,6 @@ public class Interaction : MonoBehaviour
         Vector3 origin = _playerCamera.transform.position;
         Vector3 direction = _playerCamera.transform.forward;
 
-       
         bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance, _interactableLayer);
 
         if (hitDetected)
@@ -60,7 +75,21 @@ public class Interaction : MonoBehaviour
             if (usable != null)
             {
                 _currentUsable = usable;
-                _interactionUI.text = "Press E to Pickup";
+                if (usable is ItemPickup itemPickup)
+                {
+                    if (itemPickup.item is ConsumableItem)
+                    {
+                        _interactionUI.text = "Press E to Pickup, Hold E to Consume";
+                    }
+                    else
+                    {
+                        _interactionUI.text = "Press E to Pickup";
+                    }
+                }
+                else
+                {
+                    _interactionUI.text = "Press E to Interact";
+                }
                 _interactionUI.gameObject.SetActive(true);
             }
         }
@@ -72,6 +101,12 @@ public class Interaction : MonoBehaviour
     }
 
     
+    
+    
+    
+    
+            
+            //*****EDITOR DEBUG TOOLS****//
     
     [Button("Toggle Raycast Visualisation")]
     public void ToggleRaycastVisualisation()

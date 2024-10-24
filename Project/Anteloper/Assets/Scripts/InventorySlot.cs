@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
@@ -8,13 +6,11 @@ public class InventorySlot
     public BaseItem item;
     public int itemCount;
 
-    
     public bool IsEmpty()
     {
         return item == null;
     }
 
-    // Add item to the slot (if stackable)
     public bool AddItem(BaseItem newItem, int count)
     {
         if (item == null)
@@ -30,6 +26,4 @@ public class InventorySlot
         }
         return false;
     }
-    
-    
 }

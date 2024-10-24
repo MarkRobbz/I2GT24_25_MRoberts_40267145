@@ -4,5 +4,6 @@ using UnityEngine;
 
 public interface IUsable 
 {
-    void Use();
+        void Use(bool isHold);
+    
 }
