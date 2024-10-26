@@ -22,4 +22,11 @@ public class InventorySlot
         }
         return false;
     }
+    
+    public void Copy(InventorySlot slotToCopy)
+    {
+        this.item = slotToCopy.item;
+        this.itemCount = slotToCopy.itemCount;
+    }
+
 }

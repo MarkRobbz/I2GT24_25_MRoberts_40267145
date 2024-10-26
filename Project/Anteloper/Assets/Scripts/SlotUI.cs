@@ -1,15 +1,37 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
 
-public class SlotUI : MonoBehaviour
+public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
     public Image icon; 
     public TextMeshProUGUI countText;
+    
+    
+    public InventorySlot assignedSlot;
+    private Canvas _canvas;
+    private CanvasGroup _canvasGroup;
+    private RectTransform _rectTransform;
+    private Vector2 _originalPosition;
+    private Transform _originalParent;
 
-    public void UpdateSlotUI(InventorySlot slot)
+    
+    void Awake()
     {
-        if (slot.IsEmpty())
+        _rectTransform = GetComponent<RectTransform>();
+        _canvasGroup = GetComponent<CanvasGroup>();
+        
+        if (_canvasGroup == null)
+        { 
+            _canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        }
+        _canvas = GetComponentInParent<Canvas>();
+        
+    }
+    public void UpdateSlotUI()
+    {
+        if (assignedSlot == null || assignedSlot.IsEmpty())
         {
             icon.enabled = false;
             countText.text = "";
@@ -17,23 +39,83 @@ public class SlotUI : MonoBehaviour
         }
         else
         {
-            if (slot.item == null)
+            if (assignedSlot.item == null)
             {
                 Debug.LogError("Slot item is null!");
                 return;
             }
-            if (slot.item.itemIcon == null)
+            if (assignedSlot.item.itemIcon == null)
             {
-                Debug.LogError($"Item '{slot.item.itemName}' does not have an icon assigned!");
+                Debug.LogError($"Item '{assignedSlot.item.itemName}' does not have an icon assigned!");
                 return;
             }
 
-            icon.sprite = slot.item.itemIcon; 
+            icon.sprite = assignedSlot.item.itemIcon;
             icon.enabled = true;
-            countText.text = slot.itemCount > 1 ? slot.itemCount.ToString() : "";
-            Debug.Log($"Updating slot with item: {slot.item.itemName}, Count: {slot.itemCount}");
+            countText.text = assignedSlot.itemCount > 1 ? assignedSlot.itemCount.ToString() : "";
+            Debug.Log($"Updating slot with item: {assignedSlot.item.itemName}, Count: {assignedSlot.itemCount}");
         }
     }
+
+    
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (icon.sprite == null)
+        {
+            return; // Dont drag empty slots
+        }
+
+        _originalPosition = _rectTransform.anchoredPosition;
+        _originalParent = transform.parent;
+        transform.SetParent(_canvas.transform); // Move root canvas to top
+        _canvasGroup.blocksRaycasts = false;
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (icon.sprite == null)
+        {
+            return;
+        }
+
+        _rectTransform.anchoredPosition += eventData.delta / _canvas.scaleFactor;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        transform.SetParent(_originalParent);
+        _rectTransform.anchoredPosition = _originalPosition;
+        _canvasGroup.blocksRaycasts = true;
+    }
+
+    public void OnDrop(PointerEventData eventData)
+    {
+        SlotUI draggedSlot = eventData.pointerDrag.GetComponent<SlotUI>();
+
+        if (draggedSlot != null && draggedSlot != this)
+        {
+            SwapSlots(draggedSlot);
+        }
+    }
+
+
+    private void SwapSlots(SlotUI otherSlot)
+    {
+        // temp slot to hold data
+        InventorySlot tempSlot = new InventorySlot();
+        tempSlot.Copy(this.assignedSlot);
+
+        // Swap them
+        this.assignedSlot.Copy(otherSlot.assignedSlot);
+        otherSlot.assignedSlot.Copy(tempSlot);
+
+        
+        this.UpdateSlotUI();
+        otherSlot.UpdateSlotUI();
+    }
+    
+    
+
 }
     
     

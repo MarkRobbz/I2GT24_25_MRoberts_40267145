@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
+    [SerializeField] private GameObject _inventoryUI; //disable/enable object
+    public KeyCode inventoryInputKey = KeyCode.Tab;
     public int inventorySlotCount = 30; 
     public int quickAccessSlotCount = 8; 
     public List<InventorySlot> inventorySlots = new List<InventorySlot>();
@@ -14,12 +16,35 @@ public class Inventory : MonoBehaviour
     
     public event Action onInventoryChanged;
 
+
     private void Awake()
     {
         InitialiseInventory();
     }
-
     
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            _inventoryUI.SetActive(!_inventoryUI.activeSelf);
+            UpdateCursorState();
+        }
+    }
+    
+    private void UpdateCursorState()
+    {
+        if (_inventoryUI.activeSelf)
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+        else
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+    }
     
     private void InitialiseInventory()
     {

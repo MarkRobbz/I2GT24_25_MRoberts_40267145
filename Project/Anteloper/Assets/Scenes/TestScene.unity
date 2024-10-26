@@ -1158,6 +1158,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a449d1a2c5ea04383981680f85bfa642, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _inventoryUI: {fileID: 752874457}
+  inventoryInputKey: 9
   inventorySlotCount: 30
   quickAccessSlotCount: 8
   inventorySlots: []

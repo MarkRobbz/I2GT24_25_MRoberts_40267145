@@ -23,7 +23,10 @@ public class InventoryUI : MonoBehaviour
 
         InitialiseInventoryUI();
         InitialiseQuickAccessUI();
+       
     }
+    
+    
 
     private void InitialiseInventoryUI()
     {
@@ -32,12 +35,15 @@ public class InventoryUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        foreach (InventorySlot slot in _inventory.inventorySlots)
+        foreach (var slot in _inventory.inventorySlots)
         {
             GameObject newSlotGO = Instantiate(slotPrefab, inventoryGrid);
             SlotUI slotUI = newSlotGO.GetComponent<SlotUI>();
+            slotUI.assignedSlot = slot; // Assign the InventorySlot
             inventorySlotUIs.Add(slotUI);
         }
+
+
 
         UpdateInventoryUI();
     }
@@ -49,15 +55,19 @@ public class InventoryUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        foreach (InventorySlot slot in _inventory.quickAccessSlots)
+        foreach (var slot in _inventory.quickAccessSlots)
         {
-            GameObject newSlotGO = Instantiate(slotPrefab, quickAccessGrid);
+            GameObject newSlotGO = Instantiate(slotPrefab, quickAccessGrid); 
             SlotUI slotUI = newSlotGO.GetComponent<SlotUI>();
+            slotUI.assignedSlot = slot; // Assign InventorySlot
             quickAccessSlotUIs.Add(slotUI);
         }
 
         UpdateQuickAccessUI();
     }
+
+
+
 
     void UpdateUI()
     {
@@ -67,27 +77,22 @@ public class InventoryUI : MonoBehaviour
 
     void UpdateInventoryUI()
     {
-        for (int i = 0; i < _inventory.inventorySlots.Count; i++)
+        foreach (var slotUI in inventorySlotUIs)
         {
-            inventorySlotUIs[i].UpdateSlotUI(_inventory.inventorySlots[i]);
+            slotUI.UpdateSlotUI();
         }
     }
 
     void UpdateQuickAccessUI()
     {
-        for (int i = 0; i < _inventory.quickAccessSlots.Count; i++)
+        foreach (var slotUI in quickAccessSlotUIs)
         {
-            quickAccessSlotUIs[i].UpdateSlotUI(_inventory.quickAccessSlots[i]);
+            slotUI.UpdateSlotUI();
         }
     }
+    
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            inventoryUI.SetActive(!inventoryUI.activeSelf);
-        }
-    }
+    
 
     void OnDestroy()
     {
