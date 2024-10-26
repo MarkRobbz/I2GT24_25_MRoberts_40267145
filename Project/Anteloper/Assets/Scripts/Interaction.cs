@@ -10,11 +10,11 @@ public class Interaction : MonoBehaviour
     [SerializeField] private LayerMask _interactableLayer = 1 << 8;
     [SerializeField] private TextMeshProUGUI _interactionUI;
     
-    
     [SerializeField] private KeyCode _interactKey = KeyCode.E;
-    [SerializeField] private float _holdThreshold = 0.5f; // Time in seconds considered as hold
+    [SerializeField] private float _holdThreshold = 0.5f; //seconds required to consume
     private float _interactKeyHoldTime = 0f;
-    
+    private bool _consumed = false;
+
     [SerializeField] private Inventory _inventory;
 
     private IUsable _currentUsable;
@@ -38,32 +38,61 @@ public class Interaction : MonoBehaviour
     private void Update()
     {
         _frameCount++;
-
+        
         if (_frameCount % _checkInterval == 0)
         {
             DetectInteractableObject();
         }
+        
+        HandleInteractionInput();
+    }
 
+    private void HandleInteractionInput()
+    {
         if (Input.GetKeyDown(_interactKey))
         {
-            _interactKeyHoldTime = 0f;
-            //Debug.Log("Key Down detected");
+            StartHold();
         }
+
         if (Input.GetKey(_interactKey))
         {
-            _interactKeyHoldTime += Time.deltaTime;
-            //Debug.Log("Key Held, Hold Time: " + _interactKeyHoldTime);
+            UpdateHold();
         }
+
         if (Input.GetKeyUp(_interactKey))
         {
-            bool isHold = _interactKeyHoldTime >= _holdThreshold;
-            //Debug.Log("Key Up detected, isHold: " + isHold);
-            _currentUsable.Use(isHold);
-            _interactKeyHoldTime = 0f;
+            EndHold();
         }
     }
+
+    private void StartHold()
+    {
+        _interactKeyHoldTime = 0f;
+        _consumed = false;
+    }
+
+    private void UpdateHold()
+    {
+        _interactKeyHoldTime += Time.deltaTime;
+
+        if (_interactKeyHoldTime >= _holdThreshold && !_consumed)
+        {
+            _currentUsable?.Use(true);
+            _consumed = true;
+        }
+    }
+
+    private void EndHold()
+    {
+        if (!_consumed)
+        {
+            _currentUsable?.Use(false);
+        }
+        _interactKeyHoldTime = 0f;
+        _consumed = false;
+    }
     
-    void DetectInteractableObject()
+    private void DetectInteractableObject()
     {
         RaycastHit hit;
         Vector3 origin = _playerCamera.transform.position;
@@ -106,14 +135,8 @@ public class Interaction : MonoBehaviour
             _interactionUI.gameObject.SetActive(false);
         }
     }
-
     
-    
-    
-    
-    
-            
-            //*****EDITOR DEBUG TOOLS****//
+    //*****EDITOR DEBUG TOOLS****//
     
     [Button("Toggle Raycast Visualisation")]
     public void ToggleRaycastVisualisation()
@@ -134,7 +157,6 @@ public class Interaction : MonoBehaviour
             RaycastHit hit;
             if (Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance, _interactableLayer))
             {
-                
                 Gizmos.color = Color.green;
                 Gizmos.DrawWireSphere(hit.point, _sphereRadius);
             }
