@@ -14,6 +14,8 @@ public class Interaction : MonoBehaviour
     [SerializeField] private KeyCode _interactKey = KeyCode.E;
     [SerializeField] private float _holdThreshold = 0.5f; // Time in seconds considered as hold
     private float _interactKeyHoldTime = 0f;
+    
+    [SerializeField] private Inventory _inventory;
 
     private IUsable _currentUsable;
     private int _frameCount = 0;
@@ -30,6 +32,7 @@ public class Interaction : MonoBehaviour
         
         _interactionUI = GameObject.FindGameObjectWithTag("InteractPromptUI").GetComponentInChildren<TextMeshProUGUI>();
         _interactionUI.gameObject.SetActive(false);
+        _inventory = FindObjectOfType<Inventory>();
     }
 
     private void Update()
@@ -44,17 +47,17 @@ public class Interaction : MonoBehaviour
         if (Input.GetKeyDown(_interactKey))
         {
             _interactKeyHoldTime = 0f;
-            Debug.Log("Key Down detected");
+            //Debug.Log("Key Down detected");
         }
         if (Input.GetKey(_interactKey))
         {
             _interactKeyHoldTime += Time.deltaTime;
-            Debug.Log("Key Held, Hold Time: " + _interactKeyHoldTime);
+            //Debug.Log("Key Held, Hold Time: " + _interactKeyHoldTime);
         }
         if (Input.GetKeyUp(_interactKey))
         {
             bool isHold = _interactKeyHoldTime >= _holdThreshold;
-            Debug.Log("Key Up detected, isHold: " + isHold);
+            //Debug.Log("Key Up detected, isHold: " + isHold);
             _currentUsable.Use(isHold);
             _interactKeyHoldTime = 0f;
         }
@@ -77,9 +80,13 @@ public class Interaction : MonoBehaviour
                 _currentUsable = usable;
                 if (usable is ItemPickup itemPickup)
                 {
-                    if (itemPickup.item is ConsumableItem)
+                    if (_inventory.IsInventoryFull())
                     {
-                        _interactionUI.text = "E to Pickup, Hold to Consume";
+                        _interactionUI.text = "Inventory Full";
+                    }
+                    else if (itemPickup.item is ConsumableItem)
+                    {
+                        _interactionUI.text = "Press E to Pickup, Hold E to Consume";
                     }
                     else
                     {

@@ -8,15 +8,30 @@ public class ItemPickup : MonoBehaviour, IUsable
 
     public void Use(bool isHold)
     {
-        if (isHold && item is ConsumableItem)
+        Inventory inventory = FindObjectOfType<Inventory>();
+        if (inventory != null)
         {
-            ConsumeItem((ConsumableItem)item);
+            if (inventory.IsInventoryFull())
+            {
+               Debug.Log("Cannot pick up item. Inventory is full.");
+                return;
+            }
+
+            if (isHold && item is ConsumableItem)
+            {
+                ConsumeItem((ConsumableItem)item);
+            }
+            else
+            {
+                PickupItem();
+            }
         }
         else
         {
-            PickupItem();
+            Debug.LogError("Inventory not found in scene.");
         }
     }
+
 
     private void PickupItem()
     {

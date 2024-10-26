@@ -102,7 +102,7 @@ private int AddToQuickAccess(BaseItem item, int count)
 }
 
 private int AddToInventorySlots(BaseItem item, int count)
-{
+    {
     int remainingCount = count;
 
     
@@ -140,5 +140,31 @@ private int AddToInventorySlots(BaseItem item, int count)
     }
 
     return remainingCount;
-}
+    }
+
+    public bool IsInventoryFull()
+    {
+        
+        foreach (var slot in quickAccessSlots)
+        {
+            if (slot.IsEmpty() || (slot.itemCount < slot.item.maxStackSize))
+            {
+                return false; // free space
+            }
+        }
+
+        
+        foreach (var slot in inventorySlots)
+        {
+            if (slot.IsEmpty() || (slot.itemCount < slot.item.maxStackSize))
+            {
+                return false; //free space
+            }
+        }
+
+        // Both slots are full
+        return true;
+    }
+
+
 }
