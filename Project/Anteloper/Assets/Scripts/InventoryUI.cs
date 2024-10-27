@@ -19,7 +19,7 @@ public class InventoryUI : MonoBehaviour
     {
         inventoryUI.SetActive(!inventoryUI.activeSelf);
         _inventory = FindObjectOfType<Inventory>();
-        _inventory.onInventoryChanged += UpdateUI;
+        _inventory.OnInventoryChanged += UpdateUI;
 
         InitialiseInventoryUI();
         InitialiseQuickAccessUI();
@@ -98,7 +98,7 @@ public class InventoryUI : MonoBehaviour
     {
         if (_inventory != null)
         {
-            _inventory.onInventoryChanged -= UpdateUI;
+            _inventory.OnInventoryChanged -= UpdateUI;
         }
     }
 }

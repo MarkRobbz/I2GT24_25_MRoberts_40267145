@@ -35,6 +35,8 @@ public class PlayerController : MonoBehaviour
     {
         _playerController = gameObject.GetComponent<CharacterController>();
         _mainCamera = Camera.main;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
     
     void Update()
