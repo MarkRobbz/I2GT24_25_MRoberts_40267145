@@ -64,6 +64,7 @@ public class DayNightCycle : MonoBehaviour
         Debug.Log("Night started.");
     }
 
+    public float GetCurrentTime() => _currentTime;
     public int GetDaysPassed() => _daysPassed;
     public bool IsDaytime() => _isDaytime;
 }
