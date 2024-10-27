@@ -19,6 +19,7 @@ MonoBehaviour:
     - a631300d97eb94b2cadfdf252ec75bd8
     - 6890f00ef77c6a7459d1c899bba88b07
     - ae50db0c6e4994946ba36e424108c93c
+    - bbbd97d59ae07c44e9fff5e918b7fa3a
     values:
     - colorIndex: 1
       iconNameOrGuid: cs Script Icon
@@ -30,3 +31,5 @@ MonoBehaviour:
       iconNameOrGuid: 
     - colorIndex: 8
       iconNameOrGuid: Material Icon
+    - colorIndex: 0
+      iconNameOrGuid: ScriptableObject Icon
