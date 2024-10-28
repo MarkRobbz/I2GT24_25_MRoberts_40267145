@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Craftable Item", menuName = "Items/Craftable Item")]
-public class CraftableItem : BaseItem, IUsable
+public class CraftableItem : BaseItem
 {
     [System.Serializable]
     public class Ingredient
@@ -12,9 +12,5 @@ public class CraftableItem : BaseItem, IUsable
     }
 
     public List<Ingredient> requiredItems = new List<Ingredient>();
-
-   public void Use(bool isHold)
-    {
-        
-    }
+    
 }

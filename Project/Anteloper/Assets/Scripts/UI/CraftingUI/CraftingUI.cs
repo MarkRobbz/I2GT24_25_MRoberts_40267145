@@ -5,16 +5,16 @@ using UnityEngine.UI;
 public class CraftingUI : MonoBehaviour
 {
     public GameObject craftingCanvas;
-    public Transform recipeListContent; // Content GameObject under ScrollRect
-    public GameObject recipeSlotPrefab; // Prefab for each craftable item
-
-    public List<CraftableItem> craftableItems; // Assign in the Inspector
+    public Transform recipeListContent; 
+    public GameObject recipeSlotPrefab; 
+    
+    public List<CraftableItem> craftableItems; 
 
     private Inventory inventory;
 
     void Start()
     {
-        inventory = FindObjectOfType<Inventory>(); // Reference to the player's inventory
+        inventory = FindObjectOfType<Inventory>(); 
         PopulateCraftableItems();
     }
 

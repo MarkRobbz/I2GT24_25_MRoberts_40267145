@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-[CreateAssetMenu(fileName = "NewDrinkableItem", menuName = "Inventory/DrinkableItem")]
+[CreateAssetMenu(fileName = "NewDrinkableItem", menuName = "Items/Drinkable Item")]
 public class DrinkableItem : ConsumableItem
 {
     public override void Consume()

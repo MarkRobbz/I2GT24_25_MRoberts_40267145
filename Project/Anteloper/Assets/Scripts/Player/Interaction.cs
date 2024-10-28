@@ -8,6 +8,7 @@ public class Interaction : MonoBehaviour
     [SerializeField] private float _raycastDistance = 3.0f;
     [SerializeField] private float _sphereRadius = 0.5f;
     [SerializeField] private LayerMask _interactableLayer = 1 << 8;
+    [SerializeField] private LayerMask _pickupLayer = 1 << 9;
     [SerializeField] private TextMeshProUGUI _interactionUI;
     
     [SerializeField] private KeyCode _interactKey = KeyCode.E;
@@ -98,7 +99,7 @@ public class Interaction : MonoBehaviour
         Vector3 origin = _playerCamera.transform.position;
         Vector3 direction = _playerCamera.transform.forward;
 
-        bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance, _interactableLayer);
+        bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance, _interactableLayer | _pickupLayer);
 
         if (hitDetected)
         {
@@ -108,28 +109,33 @@ public class Interaction : MonoBehaviour
             {
                 _currentUsable = usable;
 
-                if (usable is ItemPickup itemPickup)
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Interactable"))
                 {
+                    // Handle interactable objects (doors, levers, etc.)
+                    _interactionUI.text = "Press E to Interact";
+                }
+                else if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Pickup"))
+                {
+                    // Handle pickup items (BaseItem, ConsumableItem, EdibleItem)
                     if (_inventory.IsInventoryFull())
                     {
                         _interactionUI.text = "Inventory Full";
                     }
-                    else if (itemPickup.item is ConsumableItem)
+                    else if (usable is ItemPickup itemPickup)
                     {
-                        _interactionUI.text = "Press E to Pickup, Hold E to Consume";
+                        if (itemPickup.item is ConsumableItem)
+                        {
+                            _interactionUI.text = "Press E to Pickup, Hold E to Consume";
+                        }
+                        else if (itemPickup.item is BaseItem)
+                        {
+                            _interactionUI.text = "Press E to Pickup";
+                        }
+                        else if (itemPickup.item is CraftableItem)
+                        {
+                            _interactionUI.text = "Press E to Pickup";
+                        }
                     }
-                    else if (itemPickup.item is BaseItem)
-                    {
-                        _interactionUI.text = "Press E to Pickup";
-                    }
-                    else if (itemPickup.item is CraftableItem)
-                    {
-                        _interactionUI.text = "Press E to Pickup";
-                    }
-                }
-                else
-                {
-                    _interactionUI.text = "Press E to Interact";
                 }
                 _interactionUI.gameObject.SetActive(true);
             }
@@ -145,7 +151,9 @@ public class Interaction : MonoBehaviour
             _interactionUI.gameObject.SetActive(false);
         }
     }
-
+    
+    
+    
     
     //*****EDITOR DEBUG TOOLS****//
     
