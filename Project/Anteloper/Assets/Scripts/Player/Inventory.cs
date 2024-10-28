@@ -192,4 +192,97 @@ private int AddToInventorySlots(BaseItem item, int count)
     }
 
 
+    public int GetItemCount(BaseItem item)
+    {
+        int count = 0;
+
+        // Iterate through quick access slots
+        foreach (var slot in quickAccessSlots)
+        {
+            if (slot.item == item)
+            {
+                count += slot.itemCount;
+            }
+        }
+
+        // Iterate through regular inventory slots
+        foreach (var slot in inventorySlots)
+        {
+            if (slot.item == item)
+            {
+                count += slot.itemCount;
+            }
+        }
+
+        return count;
+    }
+
+    
+    public bool RemoveItem(BaseItem item, int count)
+    {
+        int remainingToRemove = count;
+
+        // Remove from quick access slots first
+        foreach (var slot in quickAccessSlots)
+        {
+            if (slot.item == item)
+            {
+                if (slot.itemCount >= remainingToRemove)
+                {
+                    slot.itemCount -= remainingToRemove;
+                    if (slot.itemCount == 0)
+                    {
+                        slot.item = null;
+                    }
+                    remainingToRemove = 0;
+                    break;
+                }
+                else
+                {
+                    remainingToRemove -= slot.itemCount;
+                    slot.itemCount = 0;
+                    slot.item = null;
+                }
+            }
+        }
+
+        // Then remove from regular inventory slots
+        if (remainingToRemove > 0)
+        {
+            foreach (var slot in inventorySlots)
+            {
+                if (slot.item == item)
+                {
+                    if (slot.itemCount >= remainingToRemove)
+                    {
+                        slot.itemCount -= remainingToRemove;
+                        if (slot.itemCount == 0)
+                        {
+                            slot.item = null;
+                        }
+                        remainingToRemove = 0;
+                        break;
+                    }
+                    else
+                    {
+                        remainingToRemove -= slot.itemCount;
+                        slot.itemCount = 0;
+                        slot.item = null;
+                    }
+                }
+            }
+        }
+
+        if (remainingToRemove == 0)
+        {
+            OnInventoryChanged?.Invoke();
+            return true;
+        }
+        else
+        {
+            Debug.LogWarning($"Not enough {item.itemName} to remove. Needed: {count}, Remaining: {remainingToRemove}");
+            return false;
+        }
+    }
+
 }

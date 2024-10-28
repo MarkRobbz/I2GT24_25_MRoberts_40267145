@@ -27,7 +27,7 @@ public class DayNightCycle : MonoBehaviour
     private void UpdateTime()
     {
         _currentTime += Time.deltaTime * (24f / (dayLengthInMinutes * 60f)); 
-        Debug.Log($"Current Time: {_currentTime}, Is Daytime: {_isDaytime}");
+        //Debug.Log($"Current Time: {_currentTime}, Is Daytime: {_isDaytime}");
 
         if (_currentTime >= 24f) // A new day
         {

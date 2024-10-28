@@ -28,5 +28,6 @@ public class InventorySlot
         this.item = slotToCopy.item;
         this.itemCount = slotToCopy.itemCount;
     }
+    
 
 }

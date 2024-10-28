@@ -107,6 +107,7 @@ public class Interaction : MonoBehaviour
             if (usable != null)
             {
                 _currentUsable = usable;
+
                 if (usable is ItemPickup itemPickup)
                 {
                     if (_inventory.IsInventoryFull())
@@ -117,7 +118,11 @@ public class Interaction : MonoBehaviour
                     {
                         _interactionUI.text = "Press E to Pickup, Hold E to Consume";
                     }
-                    else
+                    else if (itemPickup.item is BaseItem)
+                    {
+                        _interactionUI.text = "Press E to Pickup";
+                    }
+                    else if (itemPickup.item is CraftableItem)
                     {
                         _interactionUI.text = "Press E to Pickup";
                     }
@@ -128,6 +133,11 @@ public class Interaction : MonoBehaviour
                 }
                 _interactionUI.gameObject.SetActive(true);
             }
+            else
+            {
+                _currentUsable = null;
+                _interactionUI.gameObject.SetActive(false);
+            }
         }
         else
         {
@@ -135,6 +145,7 @@ public class Interaction : MonoBehaviour
             _interactionUI.gameObject.SetActive(false);
         }
     }
+
     
     //*****EDITOR DEBUG TOOLS****//
     

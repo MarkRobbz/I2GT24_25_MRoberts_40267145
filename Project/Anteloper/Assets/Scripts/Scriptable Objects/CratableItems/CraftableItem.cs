@@ -13,7 +13,7 @@ public class CraftableItem : BaseItem, IUsable
 
     public List<Ingredient> requiredItems = new List<Ingredient>();
 
-    public void Use(bool isHold)
+   public void Use(bool isHold)
     {
         
     }

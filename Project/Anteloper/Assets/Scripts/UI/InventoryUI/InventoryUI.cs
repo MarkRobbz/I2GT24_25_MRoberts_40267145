@@ -91,7 +91,6 @@ public class InventoryUI : MonoBehaviour
         }
     }
     
-
     
 
     void OnDestroy()

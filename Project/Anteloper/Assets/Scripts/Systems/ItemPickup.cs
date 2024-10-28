@@ -4,63 +4,44 @@ using UnityEngine;
 
 public class ItemPickup : MonoBehaviour, IUsable
 {
-    public BaseItem item; 
+    public BaseItem item;  
 
     public void Use(bool isHold)
     {
         Inventory inventory = FindObjectOfType<Inventory>();
-        if (inventory != null)
-        {
-            if (inventory.IsInventoryFull())
-            {
-               Debug.Log("Cannot pick up item. Inventory is full.");
-                return;
-            }
 
-            if (isHold && item is ConsumableItem)
-            {
-                ConsumeItem((ConsumableItem)item);
-            }
-            else
-            {
-                PickupItem();
-            }
+        if (inventory == null)
+        {
+            Debug.LogError("Inventory not found in scene.");
+            return;
+        }
+
+        if (inventory.IsInventoryFull())
+        {
+            Debug.LogWarning("Cannot pick up item; inventory is full.");
+            return;
+        }
+
+        
+        if (item is ConsumableItem consumableItem && isHold)
+        {
+            
+            Debug.Log($"Consuming item: {consumableItem.itemName}");
+            consumableItem.Consume();
+        }
+        else if (item is EdibleItem edibleItem && isHold)
+        {
+            // Consume edible item if held down
+            Debug.Log($"Consuming item: {edibleItem.itemName}");
+            edibleItem.Consume();
         }
         else
         {
-            Debug.LogError("Inventory not found in scene.");
+            // Pickup item and add to inventory
+            inventory.AddItem(item, 1);
+            Debug.Log($"Picked up {item.itemName}");
         }
-    }
-
-
-    private void PickupItem()
-    {
-        Inventory inventory = FindObjectOfType<Inventory>();
-        if (inventory != null)
-        {
-            if (inventory.AddItem(item, 1))
-            {
-                Destroy(gameObject);
-                Debug.Log($"Picked up {item.itemName}.");
-            }
-            else
-            {
-                Debug.Log("Inventory is full!");
-            }
-        }
-        else
-        {
-            Debug.LogError("Inventory not found in scene.");
-        }
-    }
-
-    private void ConsumeItem(ConsumableItem consumableItem)
-    {
-        Debug.Log("Consuming item: " + consumableItem.itemName);
-        consumableItem.Consume();
+        
         Destroy(gameObject);
     }
 }
-    
-
-
