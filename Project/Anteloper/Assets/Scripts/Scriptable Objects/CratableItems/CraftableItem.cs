@@ -1,17 +1,20 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// public class CraftableItem : MonoBehaviour, IUsable
-// {
-//     public string itemName; 
-//     public Sprite itemIcon; 
-//     public BaseItem[] requiredItems; 
-//     public int[] requiredItemCounts; 
-//
-//     public void Use()
-//     {
-//         
-//     }
-    
-//}
+[CreateAssetMenu(fileName = "New Craftable Item", menuName = "Items/Craftable Item")]
+public class CraftableItem : BaseItem, IUsable
+{
+    [System.Serializable]
+    public class Ingredient
+    {
+        public BaseItem item;
+        public int amount;
+    }
+
+    public List<Ingredient> requiredItems = new List<Ingredient>();
+
+    public void Use(bool isHold)
+    {
+        
+    }
+}
