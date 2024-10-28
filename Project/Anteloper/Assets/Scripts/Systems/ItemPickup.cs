@@ -29,12 +29,6 @@ public class ItemPickup : MonoBehaviour, IUsable
             Debug.Log($"Consuming item: {consumableItem.itemName}");
             consumableItem.Consume();
         }
-        else if (item is EdibleItem edibleItem && isHold)
-        {
-            // Consume edible item if held down
-            Debug.Log($"Consuming item: {edibleItem.itemName}");
-            edibleItem.Consume();
-        }
         else
         {
             // Pickup item and add to inventory

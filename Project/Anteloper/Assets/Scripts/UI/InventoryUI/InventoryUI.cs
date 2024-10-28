@@ -11,16 +11,18 @@ public class InventoryUI : MonoBehaviour
     public Transform quickAccessGrid;
 
     private Inventory _inventory;
+    private CraftingUI _craftingUI;
 
-    private List<SlotUI> inventorySlotUIs = new List<SlotUI>();
-    private List<SlotUI> quickAccessSlotUIs = new List<SlotUI>();
+    private List<SlotUI> _inventorySlotUIs = new List<SlotUI>();
+    private List<SlotUI> _quickAccessSlotUIs = new List<SlotUI>();
 
     void Start()
     {
         inventoryUI.SetActive(!inventoryUI.activeSelf);
+        _craftingUI = FindObjectOfType<CraftingUI>();
         _inventory = FindObjectOfType<Inventory>();
         _inventory.OnInventoryChanged += UpdateUI;
-
+        
         InitialiseInventoryUI();
         InitialiseQuickAccessUI();
        
@@ -40,7 +42,7 @@ public class InventoryUI : MonoBehaviour
             GameObject newSlotGO = Instantiate(slotPrefab, inventoryGrid);
             SlotUI slotUI = newSlotGO.GetComponent<SlotUI>();
             slotUI.assignedSlot = slot; // Assign the InventorySlot
-            inventorySlotUIs.Add(slotUI);
+            _inventorySlotUIs.Add(slotUI);
         }
 
 
@@ -60,7 +62,7 @@ public class InventoryUI : MonoBehaviour
             GameObject newSlotGO = Instantiate(slotPrefab, quickAccessGrid); 
             SlotUI slotUI = newSlotGO.GetComponent<SlotUI>();
             slotUI.assignedSlot = slot; // Assign InventorySlot
-            quickAccessSlotUIs.Add(slotUI);
+            _quickAccessSlotUIs.Add(slotUI);
         }
 
         UpdateQuickAccessUI();
@@ -77,7 +79,7 @@ public class InventoryUI : MonoBehaviour
 
     void UpdateInventoryUI()
     {
-        foreach (var slotUI in inventorySlotUIs)
+        foreach (var slotUI in _inventorySlotUIs)
         {
             slotUI.UpdateSlotUI();
         }
@@ -85,14 +87,45 @@ public class InventoryUI : MonoBehaviour
 
     void UpdateQuickAccessUI()
     {
-        foreach (var slotUI in quickAccessSlotUIs)
+        foreach (var slotUI in _quickAccessSlotUIs)
         {
             slotUI.UpdateSlotUI();
         }
     }
-    
-    
 
+    public bool IsInventoryUIActive()
+    {
+        return inventoryUI.activeSelf;
+    }
+   
+    public void ToggleInventoryUI()
+    {
+        inventoryUI.SetActive(!inventoryUI.activeSelf);
+    
+        if (inventoryUI.activeSelf && _craftingUI.IsCraftingUIActive())
+        {
+            _craftingUI.ToggleCraftingUI(); // Close Crafting UI if it's open
+        }
+
+        UpdateCursorState();
+    }
+
+    private void UpdateCursorState()
+    {
+        if (inventoryUI.activeSelf)
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+        else
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+    }
+
+
+    
     void OnDestroy()
     {
         if (_inventory != null)

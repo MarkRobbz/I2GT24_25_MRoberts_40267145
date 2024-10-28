@@ -22,7 +22,7 @@ public class Interaction : MonoBehaviour
     private int _frameCount = 0;
     private int _checkInterval = 10;
 
-    private bool showRaycast = false;  
+    private bool _showRaycast = false;  
 
     private void Start()
     {
@@ -160,12 +160,12 @@ public class Interaction : MonoBehaviour
     [Button("Toggle Raycast Visualisation")]
     public void ToggleRaycastVisualisation()
     {
-        showRaycast = !showRaycast;
+        _showRaycast = !_showRaycast;
     }
     
     private void OnDrawGizmos()
     {
-        if (showRaycast)
+        if (_showRaycast)
         {
             Vector3 origin = _playerCamera.transform.position;
             Vector3 direction = _playerCamera.transform.forward;

@@ -35,7 +35,7 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
         {
             icon.enabled = false;
             countText.text = "";
-            Debug.Log("Slot is empty, hiding icon and count text.");
+           // Debug.Log("Slot is empty, hiding icon and count text.");
         }
         else
         {

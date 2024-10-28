@@ -9,13 +9,13 @@ public class RecipeSlotUI : MonoBehaviour
     public TextMeshProUGUI ingredientsText;
     public Button craftButton;
 
-    private CraftableItem craftableItem;
-    private Inventory inventory;
+    private CraftableItem _craftableItem;
+    private Inventory _inventory;
 
     public void Initialise(CraftableItem craftableItem, Inventory inventory)
     {
-        this.craftableItem = craftableItem;
-        this.inventory = inventory;
+        this._craftableItem = craftableItem;
+        this._inventory = inventory;
         inventory.OnInventoryChanged += UpdateIngredientsText; 
 
         resultIcon.sprite = craftableItem.itemIcon;
@@ -30,9 +30,9 @@ public class RecipeSlotUI : MonoBehaviour
     void UpdateIngredientsText()
     {
         ingredientsText.text = "";
-        foreach (var ingredient in craftableItem.requiredItems)
+        foreach (var ingredient in _craftableItem.requiredItems)
         {
-            int totalInInventory = inventory.GetItemCount(ingredient.item);
+            int totalInInventory = _inventory.GetItemCount(ingredient.item);
             string color = totalInInventory >= ingredient.amount ? "green" : "red";
             ingredientsText.text += $"{ingredient.item.itemName} x{ingredient.amount} (<color={color}>{totalInInventory}</color>)\n";
         }
@@ -45,9 +45,9 @@ public class RecipeSlotUI : MonoBehaviour
 
     bool CanCraft()
     {
-        foreach (var ingredient in craftableItem.requiredItems)
+        foreach (var ingredient in _craftableItem.requiredItems)
         {
-            int totalInInventory = inventory.GetItemCount(ingredient.item);
+            int totalInInventory = _inventory.GetItemCount(ingredient.item);
             if (totalInInventory < ingredient.amount)
             {
                 return false;
@@ -67,12 +67,12 @@ public class RecipeSlotUI : MonoBehaviour
     void CraftItem()
     {
         
-        foreach (var ingredient in craftableItem.requiredItems) // Deduct materials
+        foreach (var ingredient in _craftableItem.requiredItems) // Deduct materials
         {
-            inventory.RemoveItem(ingredient.item, ingredient.amount);
+            _inventory.RemoveItem(ingredient.item, ingredient.amount);
         }
         
-        inventory.AddItem(craftableItem, 1);
+        _inventory.AddItem(_craftableItem, 1);
         
         UpdateCraftButton();
         UpdateIngredientsText();
@@ -80,9 +80,9 @@ public class RecipeSlotUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (inventory != null)
+        if (_inventory != null)
         {
-            inventory.OnInventoryChanged -= UpdateIngredientsText;
+            _inventory.OnInventoryChanged -= UpdateIngredientsText;
         }
     }
 }

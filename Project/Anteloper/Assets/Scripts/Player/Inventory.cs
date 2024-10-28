@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
-    [SerializeField] private GameObject _inventoryUI; // disable/enable object
+    [SerializeField] private InventoryUI _inventoryUI; 
     public KeyCode inventoryInputKey = KeyCode.Tab;
     public int inventorySlotCount = 30; 
     public int quickAccessSlotCount = 8; 
@@ -21,30 +21,17 @@ public class Inventory : MonoBehaviour
     {
         InitialiseInventory();
     }
+    
 
-  
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetKeyDown(inventoryInputKey))
         {
-            _inventoryUI.SetActive(!_inventoryUI.activeSelf);
-            UpdateCursorState();
+            _inventoryUI.ToggleInventoryUI(); 
         }
     }
     
-    private void UpdateCursorState()
-    {
-        if (_inventoryUI.activeSelf)
-        {
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
-        }
-        else
-        {
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-        }
-    }
+   
     
     private void InitialiseInventory()
     {
@@ -85,7 +72,7 @@ public class Inventory : MonoBehaviour
     }
 
     
-private int AddToQuickAccess(BaseItem item, int count)
+    private int AddToQuickAccess(BaseItem item, int count)
 {
     int remainingCount = count;
 
@@ -126,7 +113,7 @@ private int AddToQuickAccess(BaseItem item, int count)
     return remainingCount;
 }
 
-private int AddToInventorySlots(BaseItem item, int count)
+    private int AddToInventorySlots(BaseItem item, int count)
     {
     int remainingCount = count;
 
@@ -284,5 +271,7 @@ private int AddToInventorySlots(BaseItem item, int count)
             return false;
         }
     }
+    
+    
 
 }
