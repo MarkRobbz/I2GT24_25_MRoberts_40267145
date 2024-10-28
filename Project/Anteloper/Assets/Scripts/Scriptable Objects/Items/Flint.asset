@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Flint
   m_EditorClassIdentifier: 
   itemName: Flint
-  itemIcon: {fileID: 0}
+  itemIcon: {fileID: 21300000, guid: 46bb5f0da93796544a5b6f42d2ab94b5, type: 3}
   maxStackSize: 60
