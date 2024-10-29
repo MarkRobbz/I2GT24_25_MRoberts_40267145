@@ -33,6 +33,9 @@ public class PlayerController : MonoBehaviour
     private Camera _mainCamera;
     
     private PlayerEquipment _playerEquipment;
+
+    private InventoryUI _inventoryUI;
+    private CraftingUI _craftingUI;
     
     void Start()
     {
@@ -41,14 +44,24 @@ public class PlayerController : MonoBehaviour
         _mainCamera = Camera.main;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+
+        _inventoryUI = GameObject.FindObjectOfType<InventoryUI>();
+        _craftingUI = GameObject.FindObjectOfType<CraftingUI>();
     }
     
     void Update()
     {
-        HandleMovement();
-        HandleLookRotation();
-        HandleJumpAndGravity(); 
         HandleEquipmentAction();
+        HandleMovement();
+        HandleJumpAndGravity(); 
+        
+        if (_inventoryUI.IsInventoryUIActive() || _craftingUI.IsCraftingUIActive())
+        {
+            //Doesn't let look about if UI is open
+            return;
+        }
+        
+        HandleLookRotation();
     }
 
    
@@ -65,6 +78,8 @@ public class PlayerController : MonoBehaviour
         {
             movement.Normalize();
         }
+
+        
         
         movement *= _walkSpeed * speedMultiplier;
         

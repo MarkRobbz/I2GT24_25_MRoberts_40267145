@@ -57,8 +57,9 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
         if (assignedSlot == null || assignedSlot.IsEmpty())
         {
             icon.enabled = false;
+            icon.sprite = null; // Add this line to reset the sprite
             countText.text = "";
-           // Debug.Log("Slot is empty, hiding icon and count text.");
+            // Debug.Log("Slot is empty, hiding icon and count text.");
         }
         else
         {
@@ -79,6 +80,7 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
             Debug.Log($"Updating slot with item: {assignedSlot.item.itemName}, Count: {assignedSlot.itemCount}");
         }
     }
+
 
     
     public void OnPointerClick(PointerEventData eventData)
@@ -105,34 +107,45 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (icon.sprite == null)
+        if (assignedSlot == null || assignedSlot.IsEmpty())
         {
-            return; // Dont drag empty slots
+            return; // Don't drag empty slots
         }
 
         _originalPosition = _rectTransform.anchoredPosition;
         _originalParent = transform.parent;
-        transform.SetParent(_canvas.transform); // Move root canvas to top
+        transform.SetParent(_canvas.transform); // Move to root canvas
         _canvasGroup.blocksRaycasts = false;
     }
 
+
     public void OnDrag(PointerEventData eventData)
     {
-        if (icon.sprite == null)
+        if (assignedSlot == null || assignedSlot.IsEmpty())
         {
-            return;
+            return; // Don't drag empty slots
         }
 
         _rectTransform.anchoredPosition += eventData.delta / _canvas.scaleFactor;
     }
 
+
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (assignedSlot == null || assignedSlot.IsEmpty())
+        {
+            // Reset position and parent just in case
+            transform.SetParent(_originalParent);
+            _rectTransform.anchoredPosition = _originalPosition;
+            _canvasGroup.blocksRaycasts = true;
+            return; // No further action needed
+        }
+
         transform.SetParent(_originalParent);
         _rectTransform.anchoredPosition = _originalPosition;
         _canvasGroup.blocksRaycasts = true;
 
-        // Check pointer is outside Inventory UI and Quick Access UI
+        // Check if pointer is outside Inventory UI and Quick Access UI
         bool outsideInventoryUI = !RectTransformUtility.RectangleContainsScreenPoint(_inventoryUIRectTransform, Input.mousePosition, _canvas.worldCamera);
         bool outsideQuickAccessUI = !RectTransformUtility.RectangleContainsScreenPoint(_quickAccessUIRectTransform, Input.mousePosition, _canvas.worldCamera);
 
@@ -141,6 +154,7 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
             DropItemIntoWorld();
         }
     }
+
 
 
 
@@ -179,28 +193,41 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     
     private void DropItemIntoWorld()
     {
+        if (assignedSlot == null || assignedSlot.IsEmpty())
+        {
+            Debug.LogWarning("Attempted to drop an empty slot.");
+            return;
+        }
         if (assignedSlot != null && !assignedSlot.IsEmpty())
         {
+            // Check item being dropped is currently equipped
+            if (_playerEquipment.equippedItem == assignedSlot.item)
+            {
+                _playerEquipment.UnequipItem();
+                Debug.Log($"Unequipped {assignedSlot.item.itemName} before dropping it into the world.");
+            }
+
             // Instantiate item in world at the player's position
             Vector3 dropPosition = _playerEquipment.transform.position + _playerEquipment.transform.forward * 1.5f; // Distance from player
             Quaternion dropRotation = Quaternion.identity;
 
             GameObject droppedItem = Instantiate(assignedSlot.item.itemPrefab, dropPosition, dropRotation);
-            
+
             SetLayerRecursively(droppedItem, LayerMask.NameToLayer("Pickups"));
-            
+
             ItemPickup itemPickup = droppedItem.GetComponent<ItemPickup>();
             if (itemPickup == null)
             {
                 itemPickup = droppedItem.AddComponent<ItemPickup>();
                 itemPickup.item = assignedSlot.item;
             }
-            
-            _inventory.RemoveItem(assignedSlot.item, 1); // Remove one item; adjust if handling stacks differently
-            
+
+            _inventory.RemoveItem(assignedSlot.item, 1); 
+
             UpdateSlotUI();
         }
     }
+
 
     private void SetLayerRecursively(GameObject obj, int newLayer)
     {

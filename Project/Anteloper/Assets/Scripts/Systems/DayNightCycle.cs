@@ -8,13 +8,13 @@ public class DayNightCycle : MonoBehaviour
     public event Action OnNewDay;
 
     [SerializeField] private float dayLengthInMinutes = 1f; 
-    private float _currentTime;
+    [SerializeField] private float _currentTime;
     private bool _isDaytime = true;
     private int _daysPassed = 0;
 
     private void Start()
     {
-        _currentTime = 0f; //midnight
+        _currentTime = 4f; //AM
         Debug.Log("DayNightCycle is active");
     }
 
