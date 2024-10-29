@@ -93,57 +93,76 @@ public class Interaction : MonoBehaviour
         _consumed = false;
     }
     
-    private void DetectInteractableObject()
+  private void DetectInteractableObject()
+{
+    RaycastHit hit;
+    Vector3 origin = _playerCamera.transform.position;
+    Vector3 direction = _playerCamera.transform.forward;
+
+    bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance, _interactableLayer | _pickupLayer);
+
+    if (hitDetected)
     {
-        RaycastHit hit;
-        Vector3 origin = _playerCamera.transform.position;
-        Vector3 direction = _playerCamera.transform.forward;
-
-        bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance, _interactableLayer | _pickupLayer);
-
-        if (hitDetected)
+       // Debug.Log($"Hit detected on object: {hit.collider.gameObject.name}");
+        IUsable usable = hit.collider.GetComponentInParent<IUsable>();
+        
+        /*if (usable != null)
         {
-            IUsable usable = hit.collider.GetComponent<IUsable>();
+            Debug.Log($"Usable component found: {usable.GetType().Name} on object {((MonoBehaviour)usable).gameObject.name}");
+        }
+        else
+        {
+            Debug.Log("No IUsable component found on the hit object or its parents.");
+        }*/
 
-            if (usable != null)
+        if (usable != null)
+        {
+            _currentUsable = usable;
+            
+            if (((MonoBehaviour)usable).gameObject.layer == LayerMask.NameToLayer("Interactable"))
             {
-                _currentUsable = usable;
+                _interactionUI.text = "Press E to Interact";
+            }
+            else if (((MonoBehaviour)usable).gameObject.layer == LayerMask.NameToLayer("Pickups"))
+            {
+                if (_inventory.IsInventoryFull())
+                {
+                    _interactionUI.text = "Inventory Full";
+                }
+                else if (usable is ItemPickup itemPickup)
+                {
+                    //Debug.Log($"Item Type: {itemPickup.item.GetType()}");
+                    //Debug.Log($"Is EdibleItem: {itemPickup.item is EdibleItem}");
+                    //Debug.Log($"Is ConsumableItem: {itemPickup.item is ConsumableItem}");
+                    //Debug.Log($"Is BaseItem: {itemPickup.item is BaseItem}");
 
-                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Interactable"))
-                {
-                    // Handle interactable objects (doors, levers, etc.)
-                    _interactionUI.text = "Press E to Interact";
-                }
-                else if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Pickup"))
-                {
-                    // Handle pickup items (BaseItem, ConsumableItem, EdibleItem)
-                    if (_inventory.IsInventoryFull())
+                    if (itemPickup.item is EdibleItem)
                     {
-                        _interactionUI.text = "Inventory Full";
+                        _interactionUI.text = "Press E to Pickup, Hold E to Consume";
                     }
-                    else if (usable is ItemPickup itemPickup)
+                    else if (itemPickup.item is ConsumableItem)
                     {
-                        if (itemPickup.item is ConsumableItem)
-                        {
-                            _interactionUI.text = "Press E to Pickup, Hold E to Consume";
-                        }
-                        else if (itemPickup.item is BaseItem)
-                        {
-                            _interactionUI.text = "Press E to Pickup";
-                        }
-                        else if (itemPickup.item is CraftableItem)
-                        {
-                            _interactionUI.text = "Press E to Pickup";
-                        }
+                        _interactionUI.text = "Press E to Pickup, Hold E to Consume";
+                    }
+                    else if (itemPickup.item is CraftableItem)
+                    {
+                        _interactionUI.text = "Press E to Pickup";
+                    }
+                    else if (itemPickup.item is BaseItem)
+                    {
+                        _interactionUI.text = "Press E to Pickup";
                     }
                 }
-                _interactionUI.gameObject.SetActive(true);
+                else
+                {
+                    _interactionUI.text = "Press E to Pickup";
+                }
             }
             else
             {
-                _currentUsable = null;
-                _interactionUI.gameObject.SetActive(false);
+                Debug.Log($"Usable object {((MonoBehaviour)usable).gameObject.name} is on layer {LayerMask.LayerToName(((MonoBehaviour)usable).gameObject.layer)} which is not handled.");
             }
+            _interactionUI.gameObject.SetActive(true);
         }
         else
         {
@@ -151,9 +170,15 @@ public class Interaction : MonoBehaviour
             _interactionUI.gameObject.SetActive(false);
         }
     }
-    
-    
-    
+    else
+    {
+        _currentUsable = null;
+        _interactionUI.gameObject.SetActive(false);
+    }
+}
+
+
+  
     
     //*****EDITOR DEBUG TOOLS****//
     
