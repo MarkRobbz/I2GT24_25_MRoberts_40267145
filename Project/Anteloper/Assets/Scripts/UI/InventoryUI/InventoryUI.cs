@@ -71,17 +71,27 @@ public class InventoryUI : MonoBehaviour
     
     public void OnInventoryItemClicked(BaseItem item)
     {
-        if (item.itemPrefab != null)
+        if (_playerEquipment.equippedItem == item)
         {
-            _playerEquipment.EquipItem(item);
-            Debug.Log($"Equipped {item.itemName}");
+            _playerEquipment.UnequipItem(); // already equipped so unequip
+            Debug.Log($"Unequipped {item.itemName}");
         }
         else
         {
-            
-            Debug.Log($"{item.itemName} cannot be equipped; itemPrefab is null.");
+            // Equip the item
+            if (item.itemPrefab != null)
+            {
+                _playerEquipment.EquipItem(item);
+                Debug.Log($"Equipped {item.itemName}");
+            }
+            else
+            {
+                Debug.Log($"{item.itemName} cannot be equipped; itemPrefab is null.");
+            }
         }
     }
+
+
     void UpdateUI()
     {
         UpdateInventoryUI();
