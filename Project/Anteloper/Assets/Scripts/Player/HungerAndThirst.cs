@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
@@ -8,22 +7,22 @@ public class HungerAndThirst : MonoBehaviour
     [Header("Hunger Settings")]
     [SerializeField] private float _currentHunger = 100f;
     [SerializeField] private float _maxHunger = 100f;
-    [SerializeField] private float _hungerDecreaseRate = 0.10f; //per second
+    [SerializeField] private float _hungerDecreaseRate = 0.1f; // per second
 
     [Header("Thirst Settings")]
     [SerializeField] private float _currentThirst = 100f;
     [SerializeField] private float _maxThirst = 100f;
-    [SerializeField] private float _thirstDecreaseRate = 0.10f; //per second
+    [SerializeField] private float _thirstDecreaseRate = 0.1f; // per second
 
     [Header("Health Decrease Due to Hunger or Thirst")]
-    [SerializeField] private float _healthDecreaseRate = 0.50f; //per second
+    [SerializeField] private float _healthDecreaseRate = 0.5f; // per second
 
     public event Action<float> onHungerChanged;
     public event Action<float> onThirstChanged;
 
     private Health _playerHealth;
 
-    // Properties
+    
     public float CurrentHunger
     {
         get { return _currentHunger; }
@@ -105,7 +104,14 @@ public class HungerAndThirst : MonoBehaviour
     {
         if (_playerHealth == null) return;
 
-        float minHealth = _playerHealth.MaxHealth * 0.10f; // 10% of max health
+        
+        if (CurrentHunger > 0 && CurrentThirst > 0)
+        {
+            
+            return;
+        }
+
+        float minHealth = _playerHealth.MaxHealth * 0.1f; // 10% of max health
 
         if (_playerHealth.CurrentHealth > minHealth)
         {
@@ -113,7 +119,7 @@ public class HungerAndThirst : MonoBehaviour
             float potentialNewHealth = _playerHealth.CurrentHealth - healthDecreaseAmount;
 
             
-            if (potentialNewHealth < minHealth) //Doesn't drop below 10%
+            if (potentialNewHealth < minHealth) //Doesn't drop below 10
             {
                 healthDecreaseAmount = _playerHealth.CurrentHealth - minHealth;
             }
@@ -122,7 +128,7 @@ public class HungerAndThirst : MonoBehaviour
         }
     }
 
-    // Methods to modify hunger and thirst
+    
     public void ModifyHunger(float amount)
     {
         CurrentHunger += amount;
@@ -133,7 +139,7 @@ public class HungerAndThirst : MonoBehaviour
         CurrentThirst += amount;
     }
 
-    // UI Update Methods
+    
     public void UpdateHungerUI()
     {
         onHungerChanged?.Invoke(_currentHunger);
@@ -144,9 +150,6 @@ public class HungerAndThirst : MonoBehaviour
         onThirstChanged?.Invoke(_currentThirst);
     }
 
-    
-    
-    
     //============ Test methods Inspector =============
 
     [Space(20)]
