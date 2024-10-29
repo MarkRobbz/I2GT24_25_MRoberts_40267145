@@ -36,6 +36,7 @@ public class RecipeSlotUI : MonoBehaviour
             string color = totalInInventory >= ingredient.amount ? "green" : "red";
             ingredientsText.text += $"{ingredient.item.itemName} x{ingredient.amount} (<color={color}>{totalInInventory}</color>)\n";
         }
+        UpdateCraftButton();
     }
 
     void UpdateCraftButton()
