@@ -15,4 +15,6 @@ MonoBehaviour:
   itemName: Sap
   itemIcon: {fileID: 21300000, guid: 3aedbcb25bd604a6ab1a76c03544abd0, type: 3}
   maxStackSize: 60
+  itemPrefab: {fileID: 5176780657103100462, guid: a9128de33bd5b314a9c5a5e6754ab00c,
+    type: 3}
   restoreAmount: 10

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 
-public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
+public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler, IPointerClickHandler
 {
     public Image icon; 
     public TextMeshProUGUI countText;
@@ -16,7 +16,8 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     private Vector2 _originalPosition;
     private Transform _originalParent;
 
-    
+    private InventoryUI _inventoryUI;
+
     void Awake()
     {
         _rectTransform = GetComponent<RectTransform>();
@@ -28,6 +29,11 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
         }
         _canvas = GetComponentInParent<Canvas>();
         
+        _inventoryUI = FindObjectOfType<InventoryUI>();
+        if (_inventoryUI == null)
+        {
+            Debug.LogError("InventoryUI not found in the scene.");
+        }
     }
     public void UpdateSlotUI()
     {
@@ -58,6 +64,28 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     }
 
     
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (assignedSlot != null && !assignedSlot.IsEmpty())
+        {
+            Debug.Log($"Slot clicked: {assignedSlot.item.itemName}");
+
+           
+            if (_inventoryUI != null)
+            {
+                _inventoryUI.OnInventoryItemClicked(assignedSlot.item);
+            }
+            else
+            {
+                Debug.LogError("InventoryUI not found in the scene.");
+            }
+        }
+        else
+        {
+            Debug.Log("Empty slot clicked.");
+        }
+    }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (icon.sprite == null)

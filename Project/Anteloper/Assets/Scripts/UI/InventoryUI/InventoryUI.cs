@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class InventoryUI : MonoBehaviour
 
     private List<SlotUI> _inventorySlotUIs = new List<SlotUI>();
     private List<SlotUI> _quickAccessSlotUIs = new List<SlotUI>();
+    
+    private PlayerEquipment _playerEquipment;
 
     void Start()
     {
@@ -22,14 +25,12 @@ public class InventoryUI : MonoBehaviour
         _craftingUI = FindObjectOfType<CraftingUI>();
         _inventory = FindObjectOfType<Inventory>();
         _inventory.OnInventoryChanged += UpdateUI;
-        
+        _playerEquipment = GameObject.FindObjectOfType<PlayerEquipment>();
         InitialiseInventoryUI();
         InitialiseQuickAccessUI();
        
     }
     
-    
-
     private void InitialiseInventoryUI()
     {
         foreach (Transform child in inventoryGrid)
@@ -67,10 +68,20 @@ public class InventoryUI : MonoBehaviour
 
         UpdateQuickAccessUI();
     }
-
-
-
-
+    
+    public void OnInventoryItemClicked(BaseItem item)
+    {
+        if (item.itemPrefab != null)
+        {
+            _playerEquipment.EquipItem(item);
+            Debug.Log($"Equipped {item.itemName}");
+        }
+        else
+        {
+            
+            Debug.Log($"{item.itemName} cannot be equipped; itemPrefab is null.");
+        }
+    }
     void UpdateUI()
     {
         UpdateInventoryUI();

@@ -15,3 +15,5 @@ MonoBehaviour:
   itemName: Stick
   itemIcon: {fileID: 21300000, guid: 3ed0faef0a5374040bf9ffb749844e60, type: 3}
   maxStackSize: 60
+  itemPrefab: {fileID: 976776513871288564, guid: 4536141b18543764da846d47c06a6612,
+    type: 3}

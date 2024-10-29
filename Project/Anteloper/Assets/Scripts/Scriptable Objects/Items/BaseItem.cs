@@ -6,6 +6,8 @@ public class BaseItem : ScriptableObject, IUsable
     public string itemName;
     public Sprite itemIcon;
     public int maxStackSize = 60;
+    public GameObject itemPrefab; 
+
 
     public virtual void Use(bool isHold)
     {

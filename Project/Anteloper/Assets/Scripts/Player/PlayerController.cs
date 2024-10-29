@@ -26,14 +26,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private String _lookRotationYInput = "Mouse Y";
     [SerializeField] private KeyCode _sprintKeyInput = KeyCode.LeftShift;
     [SerializeField] private KeyCode _jumpKey = KeyCode.Space;
+    [SerializeField] private KeyCode _equipmentAction1 = KeyCode.Mouse0;
     
     private float _verticalRotation;
     private Vector3 _currentMovement = Vector3.zero;
     private Camera _mainCamera;
     
+    private PlayerEquipment _playerEquipment;
+    
     void Start()
     {
         _playerController = gameObject.GetComponent<CharacterController>();
+        _playerEquipment = gameObject.GetComponent<PlayerEquipment>();
         _mainCamera = Camera.main;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -44,8 +48,10 @@ public class PlayerController : MonoBehaviour
         HandleMovement();
         HandleLookRotation();
         HandleJumpAndGravity(); 
+        HandleEquipmentAction();
     }
 
+   
     void HandleMovement()
     {
         float speedMultiplier = Input.GetKey(_sprintKeyInput) ? _sprintMultiplier : 1f;
@@ -100,4 +106,26 @@ public class PlayerController : MonoBehaviour
             _currentMovement.y -= _gravity * Time.deltaTime;
         }
     }
+
+    void HandleEquipmentAction()
+    {
+        if (Input.GetKeyDown(_equipmentAction1)) 
+        {
+           
+            if (_playerEquipment.equippedItem != null)
+            {
+            
+                if (_playerEquipment.equippedItem is ToolItem toolItem)
+                {
+                    toolItem.UseTool();
+                }
+                else
+                {
+                    Debug.Log($"{_playerEquipment.equippedItem.itemName} cannot be used.");
+                }
+            }
+        }
+    }
+    
+    
 }

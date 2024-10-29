@@ -15,3 +15,5 @@ MonoBehaviour:
   itemName: Flint
   itemIcon: {fileID: 21300000, guid: 46bb5f0da93796544a5b6f42d2ab94b5, type: 3}
   maxStackSize: 60
+  itemPrefab: {fileID: 8786677292682031475, guid: 5fa60f608a914244084a6b01f3b81970,
+    type: 3}
