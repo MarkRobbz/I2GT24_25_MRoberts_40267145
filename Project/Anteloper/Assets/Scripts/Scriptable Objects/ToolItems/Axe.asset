@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: Flint Axe
   itemIcon: {fileID: 21300000, guid: 8d79a7b629960ee49b3a5705a794f9e7, type: 3}
   maxStackSize: 1
-  itemPrefab: {fileID: 5731143414934371691, guid: 6c946463c2bc77e46880845f30c8b06f,
+  itemPrefab: {fileID: 3595237258804365523, guid: 348a7a25e31d37943bace3ed6963bc5a,
     type: 3}
   requiredItems:
   - item: {fileID: 11400000, guid: a31af9855a9a86247b959bb7de0ca98d, type: 2}
