@@ -131,7 +131,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5960695784650747469}
   - component: {fileID: 2239145039453326799}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: FlintAxe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -194,7 +194,7 @@ GameObject:
   - component: {fileID: 4806001918338362421}
   - component: {fileID: 6874607062289462254}
   - component: {fileID: 9119744697114167899}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: AxeBlade
   m_TagString: Untagged
   m_Icon: {fileID: 0}

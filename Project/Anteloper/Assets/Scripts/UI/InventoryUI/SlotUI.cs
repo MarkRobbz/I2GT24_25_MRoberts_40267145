@@ -17,11 +17,19 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     private Transform _originalParent;
 
     private InventoryUI _inventoryUI;
+    private Inventory _inventory;
+    private PlayerEquipment _playerEquipment;
+
+    private RectTransform _inventoryUIRectTransform;
+    private RectTransform _quickAccessUIRectTransform;
 
     void Awake()
     {
         _rectTransform = GetComponent<RectTransform>();
         _canvasGroup = GetComponent<CanvasGroup>();
+        _inventory = GameObject.FindObjectOfType<Inventory>();
+        _inventoryUI = GameObject.FindObjectOfType<InventoryUI>();
+        _playerEquipment = GameObject.FindObjectOfType<PlayerEquipment>();
         
         if (_canvasGroup == null)
         { 
@@ -29,12 +37,21 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
         }
         _canvas = GetComponentInParent<Canvas>();
         
-        _inventoryUI = FindObjectOfType<InventoryUI>();
-        if (_inventoryUI == null)
+        
+        _inventoryUIRectTransform = _inventoryUI.inventoryGrid.GetComponent<RectTransform>();
+        if (_inventoryUIRectTransform == null)
         {
-            Debug.LogError("InventoryUI not found in the scene.");
+            Debug.LogError("Inventory UI RectTransform not found.");
+        }
+
+        
+        _quickAccessUIRectTransform = _inventoryUI.quickAccessGrid.GetComponent<RectTransform>();
+        if (_quickAccessUIRectTransform == null)
+        {
+            Debug.LogError("Quick Access UI RectTransform not found.");
         }
     }
+    
     public void UpdateSlotUI()
     {
         if (assignedSlot == null || assignedSlot.IsEmpty())
@@ -114,7 +131,18 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
         transform.SetParent(_originalParent);
         _rectTransform.anchoredPosition = _originalPosition;
         _canvasGroup.blocksRaycasts = true;
+
+        // Check pointer is outside Inventory UI and Quick Access UI
+        bool outsideInventoryUI = !RectTransformUtility.RectangleContainsScreenPoint(_inventoryUIRectTransform, Input.mousePosition, _canvas.worldCamera);
+        bool outsideQuickAccessUI = !RectTransformUtility.RectangleContainsScreenPoint(_quickAccessUIRectTransform, Input.mousePosition, _canvas.worldCamera);
+
+        if (outsideInventoryUI && outsideQuickAccessUI)
+        {
+            DropItemIntoWorld();
+        }
     }
+
+
 
     public void OnDrop(PointerEventData eventData)
     {
@@ -122,9 +150,15 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
 
         if (draggedSlot != null && draggedSlot != this)
         {
-            SwapSlots(draggedSlot);
+            // Ensure pointer is over this slot
+            if (RectTransformUtility.RectangleContainsScreenPoint(_rectTransform, Input.mousePosition, _canvas.worldCamera))
+            {
+                SwapSlots(draggedSlot);
+            }
         }
     }
+
+
 
 
     private void SwapSlots(SlotUI otherSlot)
@@ -143,6 +177,49 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     }
     
     
+    private void DropItemIntoWorld()
+    {
+        if (assignedSlot != null && !assignedSlot.IsEmpty())
+        {
+            // Instantiate item in world at the player's position
+            Vector3 dropPosition = _playerEquipment.transform.position + _playerEquipment.transform.forward * 1.5f; // Distance from player
+            Quaternion dropRotation = Quaternion.identity;
+
+            GameObject droppedItem = Instantiate(assignedSlot.item.itemPrefab, dropPosition, dropRotation);
+            
+            SetLayerRecursively(droppedItem, LayerMask.NameToLayer("Pickups"));
+            
+            ItemPickup itemPickup = droppedItem.GetComponent<ItemPickup>();
+            if (itemPickup == null)
+            {
+                itemPickup = droppedItem.AddComponent<ItemPickup>();
+                itemPickup.item = assignedSlot.item;
+            }
+            
+            _inventory.RemoveItem(assignedSlot.item, 1); // Remove one item; adjust if handling stacks differently
+            
+            UpdateSlotUI();
+        }
+    }
+
+    private void SetLayerRecursively(GameObject obj, int newLayer)
+    {
+        if (obj == null)
+        {
+            return;
+        }
+
+        obj.layer = newLayer;
+
+        foreach (Transform child in obj.transform)
+        {
+            if (child == null)
+            {
+                continue;
+            }
+            SetLayerRecursively(child.gameObject, newLayer);
+        }
+    }
 
 }
     

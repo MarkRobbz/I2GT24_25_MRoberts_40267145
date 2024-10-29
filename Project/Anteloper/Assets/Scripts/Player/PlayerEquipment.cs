@@ -9,39 +9,51 @@ public class PlayerEquipment : MonoBehaviour
 
     private int _equippedItemLayer;
     private int _pickupsLayer;
+    
 
     private void Start()
     {
         _equippedItemLayer = LayerMask.NameToLayer("EquippedItem");
         _pickupsLayer = LayerMask.NameToLayer("Pickups");
+        
     }
 
     public void EquipItem(BaseItem item)
     {
         equippedItem = item;
 
-        
         if (equippedItemModel != null)
         {
-            Destroy(equippedItemModel); //Destroy current equipped item model
+            Destroy(equippedItemModel); // Destroy current equipped item model
         }
-        
+
         if (item.itemPrefab != null)
         {
             equippedItemModel = Instantiate(item.itemPrefab, itemHolder);
-            
+
             equippedItemModel.transform.localPosition = Vector3.zero;
             equippedItemModel.transform.localRotation = Quaternion.identity;
             equippedItemModel.transform.localScale = Vector3.one;
 
             // Set layer to equipped item layer
             SetLayerRecursively(equippedItemModel, _equippedItemLayer);
+
+            // Disable Rigidbody physics on equipped item
+            Rigidbody rb = equippedItemModel.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = true;
+                rb.useGravity = false;
+            }
         }
         else
         {
             Debug.LogWarning($"{item.itemName} has no itemPrefab assigned.");
         }
     }
+
+
+
 
     private void SetLayerRecursively(GameObject obj, int newLayer)
     {
@@ -79,7 +91,6 @@ public class PlayerEquipment : MonoBehaviour
         SetLayerRecursively(equippedItemModel, _pickupsLayer);
         
         equippedItemModel.transform.parent = null;  // Detach from player
-
         Rigidbody rb = equippedItemModel.GetComponent<Rigidbody>();
         rb.AddForce(transform.forward * 2f, ForceMode.Impulse);
         equippedItemModel = null;
