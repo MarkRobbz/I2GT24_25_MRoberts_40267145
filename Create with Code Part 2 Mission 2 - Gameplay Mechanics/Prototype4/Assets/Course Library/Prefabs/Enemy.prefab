@@ -148,4 +148,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _enemyRb: {fileID: 0}
   _player: {fileID: 0}
-  speed: 3
+  speed: 1
