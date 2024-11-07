@@ -21,15 +21,32 @@ public class InventoryUI : MonoBehaviour
 
     void Start()
     {
-        inventoryUI.SetActive(!inventoryUI.activeSelf);
+        bool wasActive = inventoryUI.activeSelf;
+
+        // Temp activate for initialization
+        if (!wasActive)
+        {
+            inventoryUI.SetActive(true);
+        }
+
         _craftingUI = FindObjectOfType<CraftingUI>();
         _inventory = FindObjectOfType<Inventory>();
+        _playerEquipment = FindObjectOfType<PlayerEquipment>();
         _inventory.OnInventoryChanged += UpdateUI;
-        _playerEquipment = GameObject.FindObjectOfType<PlayerEquipment>();
+
         InitialiseInventoryUI();
         InitialiseQuickAccessUI();
-       
+
+        // Set to inactive 
+        if (!wasActive)
+        {
+            inventoryUI.SetActive(false);
+        }
+
+        UpdateCursorState();
     }
+
+
     
     private void InitialiseInventoryUI()
     {
@@ -43,10 +60,10 @@ public class InventoryUI : MonoBehaviour
             GameObject newSlotGO = Instantiate(slotPrefab, inventoryGrid);
             SlotUI slotUI = newSlotGO.GetComponent<SlotUI>();
             slotUI.assignedSlot = slot; // Assign the InventorySlot
+            slotUI.SetInventoryUI(this);// Set InventoryUI reference
+            slotUI.SetPlayerEquipment(_playerEquipment);
             _inventorySlotUIs.Add(slotUI);
         }
-
-
 
         UpdateInventoryUI();
     }
@@ -60,14 +77,17 @@ public class InventoryUI : MonoBehaviour
 
         foreach (var slot in _inventory.quickAccessSlots)
         {
-            GameObject newSlotGO = Instantiate(slotPrefab, quickAccessGrid); 
+            GameObject newSlotGO = Instantiate(slotPrefab, quickAccessGrid);
             SlotUI slotUI = newSlotGO.GetComponent<SlotUI>();
-            slotUI.assignedSlot = slot; // Assign InventorySlot
+            slotUI.assignedSlot = slot; // Assign the InventorySlot
+            slotUI.SetInventoryUI(this); // Set InventoryUI reference
+            slotUI.SetPlayerEquipment(_playerEquipment);
             _quickAccessSlotUIs.Add(slotUI);
         }
 
         UpdateQuickAccessUI();
     }
+
     
     public void OnInventoryItemClicked(BaseItem item)
     {

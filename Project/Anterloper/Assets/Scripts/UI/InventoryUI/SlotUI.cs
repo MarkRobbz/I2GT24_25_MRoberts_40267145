@@ -27,29 +27,17 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     {
         _rectTransform = GetComponent<RectTransform>();
         _canvasGroup = GetComponent<CanvasGroup>();
-        _inventory = GameObject.FindObjectOfType<Inventory>();
-        _inventoryUI = GameObject.FindObjectOfType<InventoryUI>();
-        _playerEquipment = GameObject.FindObjectOfType<PlayerEquipment>();
+        _inventory = FindObjectOfType<Inventory>();
         
         if (_canvasGroup == null)
         { 
             _canvasGroup = gameObject.AddComponent<CanvasGroup>();
+            Debug.Log("Canvas group udpated");
         }
+        
         _canvas = GetComponentInParent<Canvas>();
         
         
-        _inventoryUIRectTransform = _inventoryUI.inventoryGrid.GetComponent<RectTransform>();
-        if (_inventoryUIRectTransform == null)
-        {
-            Debug.LogError("Inventory UI RectTransform not found.");
-        }
-
-        
-        _quickAccessUIRectTransform = _inventoryUI.quickAccessGrid.GetComponent<RectTransform>();
-        if (_quickAccessUIRectTransform == null)
-        {
-            Debug.LogError("Quick Access UI RectTransform not found.");
-        }
     }
     
     public void UpdateSlotUI()
@@ -57,30 +45,50 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
         if (assignedSlot == null || assignedSlot.IsEmpty())
         {
             icon.enabled = false;
-            icon.sprite = null; // Add this line to reset the sprite
+            icon.sprite = null;
             countText.text = "";
-            // Debug.Log("Slot is empty, hiding icon and count text.");
+
+            // Allow empty slots to receive OnDrop events
+            _canvasGroup.blocksRaycasts = true;   
+            _canvasGroup.interactable = false;   
         }
         else
         {
-            if (assignedSlot.item == null)
-            {
-                Debug.LogError("Slot item is null!");
-                return;
-            }
-            if (assignedSlot.item.itemIcon == null)
-            {
-                Debug.LogError($"Item '{assignedSlot.item.itemName}' does not have an icon assigned!");
-                return;
-            }
-
             icon.sprite = assignedSlot.item.itemIcon;
             icon.enabled = true;
             countText.text = assignedSlot.itemCount > 1 ? assignedSlot.itemCount.ToString() : "";
+
+            // Allow filled slots to receive input events
+            _canvasGroup.blocksRaycasts = true;
+            _canvasGroup.interactable = true;
             Debug.Log($"Updating slot with item: {assignedSlot.item.itemName}, Count: {assignedSlot.itemCount}");
         }
     }
 
+
+    public void SetInventoryUI(InventoryUI inventoryUI)
+    {
+        _inventoryUI = inventoryUI;
+
+        _inventoryUIRectTransform = _inventoryUI.inventoryGrid.GetComponent<RectTransform>();
+        if (_inventoryUIRectTransform == null)
+        {
+            Debug.LogError("Inventory UI RectTransform not found.");
+        }
+
+        _quickAccessUIRectTransform = _inventoryUI.quickAccessGrid.GetComponent<RectTransform>();
+        if (_quickAccessUIRectTransform == null)
+        {
+            Debug.LogError("Quick Access UI RectTransform not found.");
+        }
+    }
+
+
+   
+    public void SetPlayerEquipment(PlayerEquipment playerEquipment)
+    {
+        _playerEquipment = playerEquipment;
+    }
 
     
     public void OnPointerClick(PointerEventData eventData)
@@ -114,7 +122,7 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
 
         _originalPosition = _rectTransform.anchoredPosition;
         _originalParent = transform.parent;
-        transform.SetParent(_canvas.transform); // Move to root canvas
+        transform.SetParent(_canvas.transform,true); // Move to root canvas
         _canvasGroup.blocksRaycasts = false;
     }
 
@@ -160,16 +168,25 @@ public class SlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
 
     public void OnDrop(PointerEventData eventData)
     {
-        SlotUI draggedSlot = eventData.pointerDrag.GetComponent<SlotUI>();
+        
+        //Debug.Log($"OnDrop called on {gameObject.name}");
+
+        SlotUI draggedSlot = eventData.pointerDrag?.GetComponent<SlotUI>();
 
         if (draggedSlot != null && draggedSlot != this)
         {
-            // Ensure pointer is over this slot
+            // Ensures pointer is over this slot
             if (RectTransformUtility.RectangleContainsScreenPoint(_rectTransform, Input.mousePosition, _canvas.worldCamera))
             {
+                //Debug.Log($"Swapping slots: {draggedSlot.gameObject.name} -> {gameObject.name}");
                 SwapSlots(draggedSlot);
             }
+            else
+            {
+                Debug.Log("Pointer not over slot during drop.");
+            }
         }
+        
     }
 
 

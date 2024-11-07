@@ -137,6 +137,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 313332651512880825}
   countText: {fileID: 708543652405729569}
+  assignedSlot:
+    item: {fileID: 0}
+    itemCount: 0
 --- !u!1 &5105224729050800449
 GameObject:
   m_ObjectHideFlags: 0
