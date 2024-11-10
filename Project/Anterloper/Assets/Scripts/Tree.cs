@@ -9,13 +9,16 @@ public class Tree : MonoBehaviour
     public bool isFallen = false;
     public int regrowTime = 3; // Number of days to regrow
     private int daysSinceFelled = 0;
-
+    private bool hasSpawnedLogs = false;
+    
     public GameObject stump;     
     public GameObject treeTrunk;  
 
     private Rigidbody _rigidbody;
     private Collider _collider;
     private DayNightCycle _dayNightCycle;
+    
+    
 
     private void Start()
     {
@@ -48,51 +51,81 @@ public class Tree : MonoBehaviour
         _rigidbody.AddForce(transform.forward * 2f, ForceMode.Impulse);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    public void OnTrunkCollisionEnter(Collision collision)
     {
-        if (isFallen)
+        if (isFallen && !hasSpawnedLogs)
         {
-            // When the tree trunk hits the ground, spawn logs
             if (collision.gameObject.CompareTag("Ground"))
             {
                 Debug.Log("Tree has hit the ground. Spawning logs.");
+                
+                _collider.enabled = false;
+
                 SpawnLogs();
-                treeTrunk.SetActive(false); // Disable tree trunk
+                hasSpawnedLogs = true;
+                
+                treeTrunk.SetActive(false);
             }
         }
     }
+
 
     private void SpawnLogs()
+{
+    _collider.enabled = false;
+    
+    MeshFilter mf = treeTrunk.GetComponent<MeshFilter>();
+    if (mf == null)
     {
-        float radius = 1.0f;
-        for (int i = 0; i < logCount; i++)
+        Debug.LogError("TreeTrunk has no MeshFilter");
+        return;
+    }
+
+    Mesh mesh = mf.mesh;
+    if (mesh == null)
+    {
+        Debug.LogError("TreeTrunk's MeshFilter has no mesh");
+        return;
+    }
+
+    // Get bounds in local space
+    Bounds bounds = mesh.bounds;
+
+    // Get local positions of bottom and top
+    Vector3 localBottom = bounds.center - new Vector3(0, bounds.extents.y, 0);
+    Vector3 localTop = bounds.center + new Vector3(0, bounds.extents.y, 0);
+
+    // Convert to world positions
+    Vector3 worldBottom = treeTrunk.transform.TransformPoint(localBottom);
+    Vector3 worldTop = treeTrunk.transform.TransformPoint(localTop);
+
+    // Direction along the tree trunk
+    Vector3 direction = (worldTop - worldBottom).normalized;
+
+    float trunkLength = Vector3.Distance(worldTop, worldBottom);
+
+    int numberOfLogs = logCount; 
+    float segmentLength = trunkLength / numberOfLogs;
+
+    for (int i = 0; i < numberOfLogs; i++)
+    {
+        float distanceAlongTrunk = segmentLength * (i + 0.5f);
+        Vector3 spawnPosition = worldBottom + direction * distanceAlongTrunk;
+        
+        spawnPosition += direction * 0.05f;
+        
+        GameObject log = Instantiate(logPrefab, spawnPosition, treeTrunk.transform.rotation);
+        
+        Rigidbody rb = log.GetComponent<Rigidbody>();
+        if (rb != null)
         {
-            float angle = i * Mathf.PI * 2 / logCount;
-            Vector3 offset = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
-            Vector3 spawnPosition = stump.transform.position + offset + Vector3.up * 0.5f;
-
-            GameObject log = Instantiate(logPrefab, spawnPosition, Quaternion.identity);
-
-            
-            log.transform.Rotate(0, Random.Range(0, 360), 0);
-
-            
-            Rigidbody rb = log.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                rb.isKinematic = false;
-                rb.useGravity = true;
-
-                // Apply a small random force to make logs move naturally
-                Vector3 randomForce = new Vector3(
-                    Random.Range(-0.5f, 0.5f),
-                    Random.Range(0.5f, 1.0f),
-                    Random.Range(-0.5f, 0.5f)
-                );
-                rb.AddForce(randomForce, ForceMode.Impulse);
-            }
+            rb.isKinematic = false;
+            rb.useGravity = true;
         }
     }
+}
+
+
 
     private void OnNewDay()
     {
@@ -111,27 +144,23 @@ public class Tree : MonoBehaviour
         isFallen = false;
         daysSinceFelled = 0;
         health = maxHealth;
+        hasSpawnedLogs = false;
 
-        // Reset tree trunk position and rotation
-        treeTrunk.transform.position = stump.transform.position + Vector3.up * treeTrunk.GetComponent<Renderer>().bounds.size.y / 2;
+        // Reset tree trunk position/rotation
+        treeTrunk.transform.position = stump.transform.position + Vector3.up * (treeTrunk.GetComponent<Renderer>().bounds.size.y / 2);
         treeTrunk.transform.rotation = Quaternion.identity;
 
         treeTrunk.SetActive(true);
         _rigidbody.isKinematic = true;
+        
+        _collider.enabled = true;
     }
+
+
     
-    public void OnTrunkCollisionEnter(Collision collision)
-    {
-        if (isFallen)
-        {
-            if (collision.gameObject.CompareTag("Ground"))
-            {
-                Debug.Log("Tree has hit the ground. Spawning logs.");
-                SpawnLogs();
-                treeTrunk.SetActive(false); // Disable tree trunk
-            }
-        }
-    }
+    
+
+ 
 
 
     private void OnDestroy()
