@@ -126,10 +126,8 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(_equipmentAction1)) 
         {
-           
             if (_playerEquipment.equippedItem != null)
             {
-            
                 if (_playerEquipment.equippedItem is ToolItem toolItem)
                 {
                     toolItem.UseTool();
@@ -141,6 +139,8 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
+
     
     
 }

@@ -9,6 +9,7 @@ public class Interaction : MonoBehaviour
     [SerializeField] private float _sphereRadius = 0.5f;
     [SerializeField] private LayerMask _interactableLayer = 1 << 8;
     [SerializeField] private LayerMask _pickupLayer = 1 << 9;
+    [SerializeField] private LayerMask _nodeLayer = 1 << 10;
     [SerializeField] private TextMeshProUGUI _interactionUI;
     
     [SerializeField] private KeyCode _interactKey = KeyCode.E;
@@ -23,6 +24,8 @@ public class Interaction : MonoBehaviour
     private int _checkInterval = 10;
 
     private bool _showRaycast = false;  
+    
+    private GameObject _currentInteractableObject;
 
     private void Start()
     {
@@ -93,92 +96,106 @@ public class Interaction : MonoBehaviour
         _consumed = false;
     }
     
-  private void DetectInteractableObject()
-{
-    RaycastHit hit;
-    Vector3 origin = _playerCamera.transform.position;
-    Vector3 direction = _playerCamera.transform.forward;
-
-    bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance, _interactableLayer | _pickupLayer);
-
-    if (hitDetected)
+    private void DetectInteractableObject()
     {
-       // Debug.Log($"Hit detected on object: {hit.collider.gameObject.name}");
-        IUsable usable = hit.collider.GetComponentInParent<IUsable>();
-        
-        /*if (usable != null)
-        {
-            Debug.Log($"Usable component found: {usable.GetType().Name} on object {((MonoBehaviour)usable).gameObject.name}");
-        }
-        else
-        {
-            Debug.Log("No IUsable component found on the hit object or its parents.");
-        }*/
+        RaycastHit hit;
+        Vector3 origin = _playerCamera.transform.position;
+        Vector3 direction = _playerCamera.transform.forward;
 
-        if (usable != null)
+        bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance, _interactableLayer | _pickupLayer | _nodeLayer);
+
+        if (hitDetected)
         {
-            _currentUsable = usable;
-            
-            if (((MonoBehaviour)usable).gameObject.layer == LayerMask.NameToLayer("Interactable"))
+            // Try to get IUsable
+            IUsable usable = hit.collider.GetComponentInParent<IUsable>();
+
+            if (usable != null)
             {
-                _interactionUI.text = "Press E to Interact";
-            }
-            else if (((MonoBehaviour)usable).gameObject.layer == LayerMask.NameToLayer("Pickups"))
-            {
-                if (_inventory.IsInventoryFull())
+                _currentUsable = usable;
+                _currentInteractableObject = ((MonoBehaviour)usable).gameObject;
+
+                if (_currentInteractableObject.layer == LayerMask.NameToLayer("Interactable"))
                 {
-                    _interactionUI.text = "Inventory Full";
+                    _interactionUI.text = "Press E to Interact";
                 }
-                else if (usable is ItemPickup itemPickup)
+                else if (_currentInteractableObject.layer == LayerMask.NameToLayer("Pickups"))
                 {
-                    //Debug.Log($"Item Type: {itemPickup.item.GetType()}");
-                    //Debug.Log($"Is EdibleItem: {itemPickup.item is EdibleItem}");
-                    //Debug.Log($"Is ConsumableItem: {itemPickup.item is ConsumableItem}");
-                    //Debug.Log($"Is BaseItem: {itemPickup.item is BaseItem}");
-
-                    if (itemPickup.item is EdibleItem)
+                    if (_inventory.IsInventoryFull())
                     {
-                        _interactionUI.text = "Press E to Pickup, Hold E to Consume";
+                        _interactionUI.text = "Inventory Full";
                     }
-                    else if (itemPickup.item is ConsumableItem)
+                    else if (usable is ItemPickup itemPickup)
                     {
-                        _interactionUI.text = "Press E to Pickup, Hold E to Consume";
+                        if (itemPickup.item is EdibleItem || itemPickup.item is ConsumableItem)
+                        {
+                            _interactionUI.text = "Press E to Pickup, Hold E to Consume";
+                        }
+                        else
+                        {
+                            _interactionUI.text = "Press E to Pickup";
+                        }
                     }
-                    else if (itemPickup.item is CraftableItem)
-                    {
-                        _interactionUI.text = "Press E to Pickup";
-                    }
-                    else if (itemPickup.item is BaseItem)
+                    else
                     {
                         _interactionUI.text = "Press E to Pickup";
                     }
                 }
-                else
-                {
-                    _interactionUI.text = "Press E to Pickup";
-                }
+                _interactionUI.gameObject.SetActive(true);
             }
             else
             {
-                Debug.Log($"Usable object {((MonoBehaviour)usable).gameObject.name} is on layer {LayerMask.LayerToName(((MonoBehaviour)usable).gameObject.layer)} which is not handled.");
+                Tree tree = hit.collider.GetComponentInParent<Tree>();
+                if (tree != null)
+                {
+                    _currentUsable = null;
+                    _currentInteractableObject = tree.gameObject;
+                    _interactionUI.text = "Use Axe to Chop Tree";
+                    _interactionUI.gameObject.SetActive(true);
+                }
+                else
+                {
+                    _currentUsable = null;
+                    _currentInteractableObject = null;
+                    _interactionUI.gameObject.SetActive(false);
+                }
             }
-            _interactionUI.gameObject.SetActive(true);
         }
         else
         {
             _currentUsable = null;
+            _currentInteractableObject = null;
             _interactionUI.gameObject.SetActive(false);
         }
     }
+
+public GameObject GetCurrentInteractableObject()
+{
+    if (_currentUsable != null)
+    {
+        return ((MonoBehaviour)_currentUsable).gameObject;
+    }
     else
     {
-        _currentUsable = null;
-        _interactionUI.gameObject.SetActive(false);
+        // Additionally check if the player is looking at a tree
+        RaycastHit hit;
+        Vector3 origin = _playerCamera.transform.position;
+        Vector3 direction = _playerCamera.transform.forward;
+
+        bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance);
+
+        if (hitDetected)
+        {
+            Tree tree = hit.collider.GetComponentInParent<Tree>();
+            if (tree != null)
+            {
+                return tree.gameObject;
+            }
+        }
     }
+
+    return null;
 }
 
-
-  
     
     //*****EDITOR DEBUG TOOLS****//
     
