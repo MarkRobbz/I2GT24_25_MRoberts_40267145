@@ -99,7 +99,7 @@ public class Tree : MonoBehaviour
     Vector3 worldBottom = treeTrunk.transform.TransformPoint(localBottom);
     Vector3 worldTop = treeTrunk.transform.TransformPoint(localTop);
 
-    // Direction along the tree trunk
+    // Direction along tree trunk
     Vector3 direction = (worldTop - worldBottom).normalized;
 
     float trunkLength = Vector3.Distance(worldTop, worldBottom);
