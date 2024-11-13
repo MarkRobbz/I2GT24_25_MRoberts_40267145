@@ -10,6 +10,7 @@ public class Interaction : MonoBehaviour
     [SerializeField] private LayerMask _interactableLayer = 1 << 8;
     [SerializeField] private LayerMask _pickupLayer = 1 << 9;
     [SerializeField] private LayerMask _nodeLayer = 1 << 10;
+    [SerializeField] private LayerMask _excludedLayers;
     [SerializeField] private TextMeshProUGUI _interactionUI;
     
     [SerializeField] private KeyCode _interactKey = KeyCode.E;
@@ -37,6 +38,9 @@ public class Interaction : MonoBehaviour
         _interactionUI = GameObject.FindGameObjectWithTag("InteractPromptUI").GetComponentInChildren<TextMeshProUGUI>();
         _interactionUI.gameObject.SetActive(false);
         _inventory = FindObjectOfType<Inventory>();
+        
+        int equippedItemLayer = LayerMask.NameToLayer("EquippedItem");
+        _excludedLayers = 1 << equippedItemLayer;
     }
 
     private void Update()
@@ -101,9 +105,12 @@ public class Interaction : MonoBehaviour
         RaycastHit hit;
         Vector3 origin = _playerCamera.transform.position;
         Vector3 direction = _playerCamera.transform.forward;
+        
+        int layerMask = (_interactableLayer | _pickupLayer | _nodeLayer) & ~_excludedLayers;
 
-        bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance, _interactableLayer | _pickupLayer | _nodeLayer);
+        bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance, layerMask);
 
+       
         if (hitDetected)
         {
             // Try to get IUsable
@@ -176,12 +183,14 @@ public GameObject GetCurrentInteractableObject()
     }
     else
     {
-        // Additionally check if the player is looking at a tree
+        //Check if player is looking at a tree
         RaycastHit hit;
         Vector3 origin = _playerCamera.transform.position;
         Vector3 direction = _playerCamera.transform.forward;
 
-        bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance);
+        int layerMask = Physics.DefaultRaycastLayers & ~_excludedLayers;
+
+        bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance, layerMask);
 
         if (hitDetected)
         {

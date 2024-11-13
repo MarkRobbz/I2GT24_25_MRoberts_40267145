@@ -38,12 +38,19 @@ public class PlayerEquipment : MonoBehaviour
             // Set layer to equipped item layer
             SetLayerRecursively(equippedItemModel, _equippedItemLayer);
 
-            // Disable Rigidbody physics on equipped item
+            // Disable Rb physics on equipped item
             Rigidbody rb = equippedItemModel.GetComponent<Rigidbody>();
             if (rb != null)
             {
                 rb.isKinematic = true;
                 rb.useGravity = false;
+            }
+
+            // Disable colliders on the equipped item
+            Collider[] colliders = equippedItemModel.GetComponentsInChildren<Collider>();
+            foreach (Collider collider in colliders)
+            {
+                collider.enabled = false;
             }
         }
         else
@@ -51,6 +58,7 @@ public class PlayerEquipment : MonoBehaviour
             Debug.LogWarning($"{item.itemName} has no itemPrefab assigned.");
         }
     }
+
 
 
 
