@@ -17,7 +17,8 @@ public class Tree : MonoBehaviour
     private Rigidbody _rigidbody;
     private Collider _collider;
     private DayNightCycle _dayNightCycle;
-    
+    private Vector3 _lastPlayerPosition;
+
     
 
     private void Start()
@@ -30,7 +31,7 @@ public class Tree : MonoBehaviour
         _rigidbody.isKinematic = true;
     }
 
-    public void ApplyDamage(float damage)
+    public void ApplyDamage(float damage, Vector3 playerPosition)
     {
         if (isFallen)
             return;
@@ -38,18 +39,35 @@ public class Tree : MonoBehaviour
         health -= damage;
         Debug.Log($"Tree took {damage} damage, health now {health}");
 
+        _lastPlayerPosition = playerPosition;
+        
         if (health <= 0)
         {
             FellTree();
         }
     }
-
     private void FellTree()
     {
         isFallen = true;
         _rigidbody.isKinematic = false; // Let tree trunk fall
-        _rigidbody.AddForce(transform.forward * 2f, ForceMode.Impulse);
+        
+        _rigidbody.constraints = RigidbodyConstraints.None;
+        
+        _rigidbody.useGravity = true;
+        
+        Vector3 directionToPlayer = _lastPlayerPosition - treeTrunk.transform.position;
+        
+        Vector3 fallDirection = -directionToPlayer.normalized;
+        
+        float treeHeight = treeTrunk.GetComponent<Renderer>().bounds.size.y;
+        Vector3 forcePosition = treeTrunk.transform.position + Vector3.up * (treeHeight * 0.8f);
+        
+        float forceMagnitude = 500f; //Tree mass is 2000 (2 tons)
+        Vector3 force = fallDirection * forceMagnitude;
+        _rigidbody.AddForceAtPosition(force, forcePosition, ForceMode.Impulse);
     }
+
+
 
     public void OnTrunkCollisionEnter(Collision collision)
     {
@@ -156,11 +174,7 @@ public class Tree : MonoBehaviour
         _collider.enabled = true;
     }
 
-
     
-    
-
- 
 
 
     private void OnDestroy()

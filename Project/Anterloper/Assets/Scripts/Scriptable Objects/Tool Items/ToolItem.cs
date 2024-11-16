@@ -20,7 +20,7 @@ public class ToolItem : CraftableItem
     public void UseTool()
     {
         Debug.Log($"Using {itemName} as a {toolType}");
-        
+    
         Interaction interaction = FindObjectOfType<Interaction>();
 
         if (interaction != null)
@@ -34,7 +34,10 @@ public class ToolItem : CraftableItem
                     Tree tree = targetObject.GetComponent<Tree>();
                     if (tree != null)
                     {
-                        tree.ApplyDamage(toolDamage);
+                        
+                        Vector3 playerPosition = interaction.transform.position; //so tree falls away from player
+                        
+                        tree.ApplyDamage(toolDamage, playerPosition);
                         Debug.Log($"Applied {toolDamage} damage to the tree. Tree health is now {tree.health}");
                     }
                     else
@@ -57,5 +60,6 @@ public class ToolItem : CraftableItem
             Debug.LogError("Interaction component not found on the player.");
         }
     }
+
 
 }
