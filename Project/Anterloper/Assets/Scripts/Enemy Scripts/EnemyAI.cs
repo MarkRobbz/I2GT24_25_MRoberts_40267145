@@ -110,10 +110,13 @@ public class EnemyAI : MonoBehaviour
 
     void FleeFromPlayer()
     {
-        Vector3 direction = (transform.position - player.position).normalized;
-        Vector3 fleePosition = transform.position + direction * fleeDistance;
-        _agent.SetDestination(fleePosition);
+        
+        FacePlayer();
+        
+        Vector3 moveDirection = -transform.forward; // Move backwards from player (while facing player)
+        _agent.Move(moveDirection * _agent.speed * Time.deltaTime);
     }
+
 
     void AttackPlayer()
     {
@@ -162,4 +165,15 @@ public class EnemyAI : MonoBehaviour
             //*Implement patrolling leter*
         }
     }
+    
+    void FacePlayer()
+    {
+        Vector3 direction = (player.position - transform.position).normalized;
+        if (direction != Vector3.zero)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+        }
+    }
+
 }
