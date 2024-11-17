@@ -2640,6 +2640,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dayLengthInMinutes: 3
   _currentTime: 12
+  _daysPassed: 0
 --- !u!4 &885537647
 Transform:
   m_ObjectHideFlags: 0
@@ -3922,7 +3923,7 @@ GameObject:
   - component: {fileID: 989903805}
   - component: {fileID: 989903804}
   - component: {fileID: 989903803}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4406,11 +4407,12 @@ GameObject:
   - component: {fileID: 1309036259}
   - component: {fileID: 1309036258}
   - component: {fileID: 1309036257}
+  - component: {fileID: 1309036261}
   - component: {fileID: 1309036256}
   - component: {fileID: 1309036255}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Enemy
-  m_TagString: Player
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4453,9 +4455,11 @@ MonoBehaviour:
   player: {fileID: 649903818}
   stalkingDistance: 15
   fleeDistance: 10
+  chaseDistance: 20
   attackDistance: 3
   attackDamage: 10
   attackCooldown: 3
+  attackAfterDays: 2
 --- !u!136 &1309036257
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -4545,6 +4549,20 @@ Transform:
   - {fileID: 989903802}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1309036261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309036254}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db9358e605860479c9644c34d8d3d60e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _currentHealth: 100
+  _maxHealth: 100
 --- !u!1 &1326080733
 GameObject:
   m_ObjectHideFlags: 0

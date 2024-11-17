@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Tree : MonoBehaviour
+public class Tree : MonoBehaviour, IAttackable
 {
     public float health = 100f;
     public float maxHealth = 100f;
@@ -31,7 +31,7 @@ public class Tree : MonoBehaviour
         _rigidbody.isKinematic = true;
     }
 
-    public void ApplyDamage(float damage, Vector3 playerPosition)
+    public void TakeDamage(float damage)
     {
         if (isFallen)
             return;
@@ -39,11 +39,28 @@ public class Tree : MonoBehaviour
         health -= damage;
         Debug.Log($"Tree took {damage} damage, health now {health}");
 
-        _lastPlayerPosition = playerPosition;
-        
+        // Update the player's position when taking damage
+        UpdateLastPlayerPosition();
+
         if (health <= 0)
         {
             FellTree();
+        }
+    }
+
+
+    private void UpdateLastPlayerPosition()
+    {
+        // Assuming the attacker is always the player
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player != null)
+        {
+            _lastPlayerPosition = player.transform.position;
+        }
+        else
+        {
+            Debug.LogWarning("Player not found; using default position.");
+            _lastPlayerPosition = transform.position; // Fallback to tree's position
         }
     }
     private void FellTree()

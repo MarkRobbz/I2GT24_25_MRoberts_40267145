@@ -14,52 +14,38 @@ public class ToolItem : CraftableItem
 {
     public ToolType toolType;
     public float toolDamage = 25f; 
-
+   
    
 
     public void UseTool()
     {
         Debug.Log($"Using {itemName} as a {toolType}");
-    
-        Interaction interaction = FindObjectOfType<Interaction>();
 
-        if (interaction != null)
+        // Get players equipped item model
+        PlayerEquipment playerEquipment = FindObjectOfType<PlayerEquipment>();
+        GameObject equippedItemModel = playerEquipment?.equippedItemModel;
+
+        if (equippedItemModel != null)
         {
-            GameObject targetObject = interaction.GetCurrentInteractableObject();
+            // Try get the Attack component
+            Attack attackComponent = equippedItemModel.GetComponent<Attack>();
+            if (attackComponent == null)
+            {
+                attackComponent = equippedItemModel.AddComponent<Attack>();
+                attackComponent.damage = toolDamage;
+                attackComponent.attackRange = 3f; 
+                attackComponent.targetLayer = LayerMask.GetMask("Targets", "NodeLayer");
+            }
 
-            if (targetObject != null)
-            {
-                if (toolType == ToolType.Axe)
-                {
-                    Tree tree = targetObject.GetComponent<Tree>();
-                    if (tree != null)
-                    {
-                        
-                        Vector3 playerPosition = interaction.transform.position; //so tree falls away from player
-                        
-                        tree.ApplyDamage(toolDamage, playerPosition);
-                        Debug.Log($"Applied {toolDamage} damage to the tree. Tree health is now {tree.health}");
-                    }
-                    else
-                    {
-                        Debug.Log("Target is not a tree.");
-                    }
-                }
-                else if (toolType == ToolType.Pickaxe)
-                {
-                    // Handle mining actions here
-                }
-            }
-            else
-            {
-                Debug.Log("No interactable object in range.");
-            }
+            // Perform attack
+            attackComponent.PerformAttack();
         }
         else
         {
-            Debug.LogError("Interaction component not found on the player.");
+            Debug.LogWarning("No equipped item model found.");
         }
     }
+
 
 
 }

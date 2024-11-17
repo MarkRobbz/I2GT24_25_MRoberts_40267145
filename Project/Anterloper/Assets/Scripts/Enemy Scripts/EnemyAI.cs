@@ -20,8 +20,9 @@ public class EnemyAI : MonoBehaviour
     private DayNightCycle _dayNightCycle;
     private int _daysPassed;
 
+    private Health _health; 
     private Health _playerHealth;
-
+    
     private bool _canAttack = false;
     private bool _decisionMade = false;   // Tracks if the enemy has made a decision after allowed days
     
@@ -29,6 +30,7 @@ public class EnemyAI : MonoBehaviour
 
     void Start()
     {
+        
         _agent = GetComponent<NavMeshAgent>();
         _dayNightCycle = FindObjectOfType<DayNightCycle>();
 
@@ -41,6 +43,13 @@ public class EnemyAI : MonoBehaviour
         _agent.updatePosition = true;
         _agent.updateRotation = false; // Controlling rotation manually to move backwards facing player
 
+        
+        _health = GetComponent<Health>(); 
+        if (_health == null)
+        {
+            Debug.LogError("Health component missing on EnemyAI.");
+        }
+        
         if (player != null)
         {
             _playerHealth = player.GetComponent<Health>();
@@ -260,6 +269,14 @@ public class EnemyAI : MonoBehaviour
         {
             Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
             transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+        }
+    }
+    
+    public void TakeDamage(float damage, Vector3 attackerPosition)
+    {
+        if (_health != null)
+        {
+            _health.DecreaseHealth(damage);
         }
     }
 }
