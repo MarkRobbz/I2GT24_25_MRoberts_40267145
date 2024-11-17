@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
-public class Health : MonoBehaviour
+public class Health : MonoBehaviour, IAttackable
 {
     [SerializeField] private float _currentHealth;
     [SerializeField] private float _maxHealth;
@@ -61,6 +61,10 @@ public class Health : MonoBehaviour
         
     }
     
+    public void TakeDamage(float damage)
+    {
+        DecreaseHealth(damage);
+    }
     
     public void ChangeHealthOverTime(float healthPoints, float duration, bool isIncrease)
     {
