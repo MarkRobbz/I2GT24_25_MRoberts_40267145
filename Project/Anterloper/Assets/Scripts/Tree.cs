@@ -48,10 +48,12 @@ public class Tree : MonoBehaviour, IAttackable
         }
     }
 
-
+    public TargetType GetTargetType()
+    {
+        return TargetType.Tree;
+    }
     private void UpdateLastPlayerPosition()
     {
-        // Assuming the attacker is always the player
         GameObject player = GameObject.FindWithTag("Player");
         if (player != null)
         {

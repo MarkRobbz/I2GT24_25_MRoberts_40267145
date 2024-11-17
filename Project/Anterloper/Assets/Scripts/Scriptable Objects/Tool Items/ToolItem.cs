@@ -13,31 +13,54 @@ public enum ToolType
 public class ToolItem : CraftableItem
 {
     public ToolType toolType;
-    public float toolDamage = 25f; 
-   
-   
+    public float baseDamage = 10f; // Base damage (optional)
+
+    // Define a list of damage values against different target types
+    [System.Serializable]
+    public struct DamageAgainstTarget
+    {
+        public TargetType targetType;
+        public float damageValue;
+    }
+
+    public List<DamageAgainstTarget> damageValues;
+
+    // Method to get damage against a specific target type
+    public float GetDamageAgainst(TargetType targetType)
+    {
+        foreach (var damageEntry in damageValues)
+        {
+            if (damageEntry.targetType == targetType)
+            {
+                return damageEntry.damageValue;
+            }
+        }
+        return 0f; // Default to 0 if no entry found
+    }
 
     public void UseTool()
     {
         Debug.Log($"Using {itemName} as a {toolType}");
 
-        // Get players equipped item model
+        // Get the player's equipped item model
         PlayerEquipment playerEquipment = FindObjectOfType<PlayerEquipment>();
         GameObject equippedItemModel = playerEquipment?.equippedItemModel;
 
         if (equippedItemModel != null)
         {
-            // Try get the Attack component
+            // Try to get the Attack component
             Attack attackComponent = equippedItemModel.GetComponent<Attack>();
             if (attackComponent == null)
             {
                 attackComponent = equippedItemModel.AddComponent<Attack>();
-                attackComponent.damage = toolDamage;
-                attackComponent.attackRange = 3f; 
+                attackComponent.attackRange = 3f; // Adjust as needed
                 attackComponent.targetLayer = LayerMask.GetMask("Targets", "NodeLayer");
             }
 
-            // Perform attack
+            // Set the tool item in the Attack component
+            attackComponent.toolItem = this;
+
+            // Perform the attack
             attackComponent.PerformAttack();
         }
         else
@@ -45,7 +68,4 @@ public class ToolItem : CraftableItem
             Debug.LogWarning("No equipped item model found.");
         }
     }
-
-
-
 }

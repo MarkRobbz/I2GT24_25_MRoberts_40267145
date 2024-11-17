@@ -5,7 +5,9 @@ using UnityEngine;
 public interface IAttackable
 {
     void TakeDamage(float damage);
+    TargetType GetTargetType();
 }
+
 
 
 

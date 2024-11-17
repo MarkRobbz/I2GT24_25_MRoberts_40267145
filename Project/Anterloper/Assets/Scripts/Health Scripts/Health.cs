@@ -8,6 +8,7 @@ public class Health : MonoBehaviour, IAttackable
 {
     [SerializeField] private float _currentHealth;
     [SerializeField] private float _maxHealth;
+    [SerializeField] private TargetType _targetType = TargetType.None; // *Set in Inspector*
 
     public event Action<float> OnHealthChanged;
     
@@ -121,7 +122,10 @@ public class Health : MonoBehaviour, IAttackable
 
     
     
-    
+    public TargetType GetTargetType()
+    {
+        return _targetType;
+    }
     
     
     
