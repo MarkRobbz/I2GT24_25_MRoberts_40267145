@@ -11,9 +11,9 @@ public class EnemyAI : MonoBehaviour
     public float fleeDistance = 10f;
     public float attackDistance = 5f;
 
-    public float attackDamage = 10f;       // damage per attack
-    public float attackCooldown = 1f;      // Time between attacks in seconds
-    private float attackTimer = 0f;        // to track cooldown
+    public float attackDamage = 10f;  //damage per attack
+    public float attackCooldown = 1f; //Time between attacks in secs
+    private float attackTimer = 0f; //to track cooldown
 
     private NavMeshAgent _agent;
     private DayNightCycle _dayNightCycle;
@@ -31,9 +31,12 @@ public class EnemyAI : MonoBehaviour
         _dayNightCycle.OnNewDay += OnNewDay;
 
         currentState = EnemyState.Idle;
-        gameObject.SetActive(false); // Hide enemy during the day
+        gameObject.SetActive(false); // Hide enemy during day
 
         
+        _agent.updatePosition = true;
+        _agent.updateRotation = false; //Controling rotation manually to move backwards facing player
+
         if (player != null)
         {
             _playerHealth = player.GetComponent<Health>();
@@ -51,7 +54,7 @@ public class EnemyAI : MonoBehaviour
     void Update()
     {
         if (currentState == EnemyState.Idle) return;
-        
+
         attackTimer -= Time.deltaTime;
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
@@ -99,6 +102,12 @@ public class EnemyAI : MonoBehaviour
                 }
                 break;
         }
+
+        // Face the player in all states except Idle
+        if (currentState != EnemyState.Idle)
+        {
+            FacePlayer();
+        }
     }
 
     void StalkPlayer()
@@ -110,21 +119,25 @@ public class EnemyAI : MonoBehaviour
 
     void FleeFromPlayer()
     {
-        
-        FacePlayer();
-        
-        Vector3 moveDirection = -transform.forward; // Move backwards from player (while facing player)
-        _agent.Move(moveDirection * _agent.speed * Time.deltaTime);
-    }
+        // Calculate a point away from the player
+        Vector3 fleeDirection = (transform.position - player.position).normalized;
+        Vector3 fleeTarget = transform.position + fleeDirection * fleeDistance;
 
+        // Find a valid point on the NavMesh
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(fleeTarget, out hit, fleeDistance, NavMesh.AllAreas))
+        {
+            _agent.SetDestination(hit.position);
+        }
+        else
+        {
+            // If no valid point is found, just move directly away from the player
+            _agent.SetDestination(transform.position + fleeDirection * fleeDistance);
+        }
+    }
 
     void AttackPlayer()
     {
-        // Face player
-        Vector3 direction = (player.position - transform.position).normalized;
-        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
-
         // Check if can attack
         if (attackTimer <= 0f)
         {
@@ -141,7 +154,8 @@ public class EnemyAI : MonoBehaviour
             // Reset attack timer
             attackTimer = attackCooldown;
         }
-        
+
+        // Stop moving when attacking
         _agent.SetDestination(transform.position);
     }
 
@@ -162,18 +176,26 @@ public class EnemyAI : MonoBehaviour
         _daysPassed = _dayNightCycle.GetDaysPassed();
         if (_daysPassed >= 2)
         {
-            //*Implement patrolling leter*
+            //*Implement patrolling later*
         }
     }
-    
+
     void FacePlayer()
     {
         Vector3 direction = (player.position - transform.position).normalized;
+
+        //*Change to head movement later*
+        // Add slight randomness (creepy factor)
+        float lookAwayChance = .05f; // 5% chance each frame
+        if (Random.value < lookAwayChance)
+        {
+            direction += new Vector3(Random.Range(-0.2f, 0.2f), 0, Random.Range(-0.2f, 0.2f));
+        }
+
         if (direction != Vector3.zero)
         {
             Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
             transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
         }
     }
-
 }
