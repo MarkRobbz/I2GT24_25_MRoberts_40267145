@@ -9,8 +9,9 @@ public class DayNightCycle : MonoBehaviour
 
     [SerializeField] private float dayLengthInMinutes = 1f; 
     [SerializeField] private float _currentTime;
+    
     private bool _isDaytime = true;
-    private int _daysPassed = 0;
+    [SerializeField] private int _daysPassed = 0;
 
     private void Start()
     {

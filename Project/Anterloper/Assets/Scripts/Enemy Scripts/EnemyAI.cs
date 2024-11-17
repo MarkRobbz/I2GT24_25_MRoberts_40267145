@@ -3,23 +3,29 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-    public enum EnemyState { Idle, Stalking, Fleeing, Attacking }
+    public enum EnemyState { Idle, Stalking, Fleeing, Chasing, Attacking }
     public EnemyState currentState = EnemyState.Idle;
 
     public Transform player;
-    public float stalkingDistance = 15f;
-    public float fleeDistance = 10f;
-    public float attackDistance = 5f;
+    public float stalkingDistance = 15f; // Distance to stalk player from
+    public float fleeDistance = 10f;     // Distance at which the enemy starts fleeing
+    public float chaseDistance = 20f;    // Max distance to chase the player
+    public float attackDistance = 5f;    // Distance at which the enemy can attack
 
-    public float attackDamage = 10f;  //damage per attack
-    public float attackCooldown = 1f; //Time between attacks in secs
-    private float attackTimer = 0f; //to track cooldown
+    public float attackDamage = 10f;     // Damage per attack
+    public float attackCooldown = 1f;    // Time between attacks in seconds
+    private float _attackTimer = 0f;     // Tracks attack cooldown
 
     private NavMeshAgent _agent;
     private DayNightCycle _dayNightCycle;
     private int _daysPassed;
 
     private Health _playerHealth;
+
+    private bool _canAttack = false;
+    private bool _decisionMade = false;   // Tracks if the enemy has made a decision after allowed days
+    
+    public int attackAfterDays = 2; //  Easy=4, Medium=2, Hard=0
 
     void Start()
     {
@@ -30,12 +36,10 @@ public class EnemyAI : MonoBehaviour
         _dayNightCycle.OnDayStart += OnDayStart;
         _dayNightCycle.OnNewDay += OnNewDay;
 
-        currentState = EnemyState.Idle;
         gameObject.SetActive(false); // Hide enemy during day
 
-        
         _agent.updatePosition = true;
-        _agent.updateRotation = false; //Controling rotation manually to move backwards facing player
+        _agent.updateRotation = false; // Controlling rotation manually to move backwards facing player
 
         if (player != null)
         {
@@ -49,30 +53,62 @@ public class EnemyAI : MonoBehaviour
         {
             Debug.LogError("Player Transform not assigned in EnemyAI script!");
         }
+        
+        _daysPassed = _dayNightCycle.GetDaysPassed();
+        _canAttack = (_daysPassed >= attackAfterDays);
     }
 
     void Update()
     {
-        if (currentState == EnemyState.Idle) return;
+        // If enemy is inactive, don't process any state
+        if (!gameObject.activeSelf) return;
 
-        attackTimer -= Time.deltaTime;
+        _attackTimer -= Time.deltaTime;
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
         switch (currentState)
         {
             case EnemyState.Stalking:
-                if (distanceToPlayer < fleeDistance)
+                if (_canAttack && !_decisionMade)
                 {
-                    currentState = EnemyState.Fleeing;
-                }
-                else if (distanceToPlayer < attackDistance)
-                {
-                    currentState = EnemyState.Attacking;
+                    _decisionMade = true;
+                    float randomValue = Random.value;
+                    if (randomValue < 0.5f)
+                    {
+                        // Continue stalking
+                        StalkPlayer();
+                    }
+                    else
+                    {
+                        // Start chasing the player
+                        currentState = EnemyState.Chasing;
+                    }
                 }
                 else
                 {
-                    StalkPlayer();
+                    // Maintain stalking behavior
+                    if (distanceToPlayer < fleeDistance)
+                    {
+                        currentState = EnemyState.Fleeing;
+                    }
+                    else if (distanceToPlayer < attackDistance)
+                    {
+                        if (_canAttack)
+                        {
+                            // Attack before fleeing
+                            AttackPlayer();
+                            currentState = EnemyState.Fleeing;
+                        }
+                        else
+                        {
+                            currentState = EnemyState.Fleeing;
+                        }
+                    }
+                    else
+                    {
+                        StalkPlayer();
+                    }
                 }
                 break;
 
@@ -81,29 +117,44 @@ public class EnemyAI : MonoBehaviour
                 {
                     currentState = EnemyState.Stalking;
                 }
-                else if (distanceToPlayer < attackDistance)
-                {
-                    currentState = EnemyState.Attacking;
-                }
                 else
                 {
                     FleeFromPlayer();
                 }
                 break;
 
+            case EnemyState.Chasing:
+                if (distanceToPlayer > chaseDistance)
+                {
+                    // Stop chasing if player is too far
+                    currentState = EnemyState.Stalking;
+                }
+                else if (distanceToPlayer <= attackDistance)
+                {
+                    currentState = EnemyState.Attacking;
+                }
+                else
+                {
+                    ChasePlayer();
+                }
+                break;
+
             case EnemyState.Attacking:
                 if (distanceToPlayer > attackDistance)
                 {
-                    currentState = EnemyState.Stalking;
+                    // Continue chasing if player moves out of attack range
+                    currentState = EnemyState.Chasing;
                 }
                 else
                 {
                     AttackPlayer();
                 }
                 break;
+
+            case EnemyState.Idle:
+                break;
         }
 
-        // Face the player in all states except Idle
         if (currentState != EnemyState.Idle)
         {
             FacePlayer();
@@ -112,6 +163,7 @@ public class EnemyAI : MonoBehaviour
 
     void StalkPlayer()
     {
+        // Follow the player but maintain a certain distance
         Vector3 direction = (player.position - transform.position).normalized;
         Vector3 targetPosition = player.position - direction * stalkingDistance;
         _agent.SetDestination(targetPosition);
@@ -119,7 +171,7 @@ public class EnemyAI : MonoBehaviour
 
     void FleeFromPlayer()
     {
-        // Calculate a point away from the player
+        // Move away from the player to maintain distance
         Vector3 fleeDirection = (transform.position - player.position).normalized;
         Vector3 fleeTarget = transform.position + fleeDirection * fleeDistance;
 
@@ -136,10 +188,19 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
+    void ChasePlayer()
+    {
+        // Chase the player
+        _agent.SetDestination(player.position);
+    }
+
     void AttackPlayer()
     {
+        // Stop moving when attacking
+        _agent.SetDestination(transform.position);
+
         // Check if can attack
-        if (attackTimer <= 0f)
+        if (_attackTimer <= 0f)
         {
             if (_playerHealth != null)
             {
@@ -152,17 +213,19 @@ public class EnemyAI : MonoBehaviour
             }
 
             // Reset attack timer
-            attackTimer = attackCooldown;
+            _attackTimer = attackCooldown;
         }
-
-        // Stop moving when attacking
-        _agent.SetDestination(transform.position);
     }
 
     void OnNightStart()
     {
         gameObject.SetActive(true);
         currentState = EnemyState.Stalking;
+        _decisionMade = false; // Reset for the night
+
+        // Update _canAttack in case difficulty changed
+        _daysPassed = _dayNightCycle.GetDaysPassed();
+        _canAttack = (_daysPassed >= attackAfterDays);
     }
 
     void OnDayStart()
@@ -174,8 +237,9 @@ public class EnemyAI : MonoBehaviour
     void OnNewDay()
     {
         _daysPassed = _dayNightCycle.GetDaysPassed();
-        if (_daysPassed >= 2)
+        if (_daysPassed >= attackAfterDays)
         {
+            _canAttack = true;
             //*Implement patrolling later*
         }
     }
