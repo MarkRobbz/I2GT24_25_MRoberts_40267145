@@ -23,3 +23,11 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: 4af45019a490b61449d9d05d42f60375, type: 2}
     amount: 1
   toolType: 1
+  baseDamage: 25
+  damageValues:
+  - targetType: 1
+    damageValue: 25
+  - targetType: 2
+    damageValue: 15
+  - targetType: 3
+    damageValue: 0

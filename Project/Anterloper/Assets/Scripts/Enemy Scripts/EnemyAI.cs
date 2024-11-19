@@ -72,6 +72,12 @@ public class EnemyAI : MonoBehaviour
         // If enemy is inactive, don't process any state
         if (!gameObject.activeSelf) return;
 
+        if (_health.CurrentHealth <= 0)
+        {
+            Destroy(gameObject);
+            return; 
+        }
+
         _attackTimer -= Time.deltaTime;
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
@@ -172,6 +178,10 @@ public class EnemyAI : MonoBehaviour
 
     void StalkPlayer()
     {
+        if (_agent == null || !_agent.isActiveAndEnabled || !_agent.isOnNavMesh)
+        {
+            return;
+        }
         // Follow the player but maintain a certain distance
         Vector3 direction = (player.position - transform.position).normalized;
         Vector3 targetPosition = player.position - direction * stalkingDistance;
@@ -180,6 +190,11 @@ public class EnemyAI : MonoBehaviour
 
     void FleeFromPlayer()
     {
+        if (_agent == null || !_agent.isActiveAndEnabled || !_agent.isOnNavMesh)
+        {
+            return;
+        }
+        
         // Move away from the player to maintain distance
         Vector3 fleeDirection = (transform.position - player.position).normalized;
         Vector3 fleeTarget = transform.position + fleeDirection * fleeDistance;
