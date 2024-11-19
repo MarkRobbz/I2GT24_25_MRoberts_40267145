@@ -287,11 +287,14 @@ public class EnemyAI : MonoBehaviour
         }
     }
     
-    public void TakeDamage(float damage, Vector3 attackerPosition)
+    private void OnDestroy()
     {
-        if (_health != null)
+        if (_dayNightCycle != null)
         {
-            _health.DecreaseHealth(damage);
+            _dayNightCycle.OnNightStart -= OnNightStart;
+            _dayNightCycle.OnDayStart -= OnDayStart;
+            _dayNightCycle.OnNewDay -= OnNewDay;
         }
     }
+    
 }
