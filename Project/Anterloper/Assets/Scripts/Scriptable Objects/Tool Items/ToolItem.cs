@@ -13,9 +13,10 @@ public enum ToolType
 public class ToolItem : CraftableItem
 {
     public ToolType toolType;
-    public float baseDamage = 10f; // Base damage (optional)
+    public float baseDamage = 10f; // Base damage
+    public float attackRate = 1f; // Attacks per second
 
-    // Define a list of damage values against different target types
+    
     [System.Serializable]
     public struct DamageAgainstTarget
     {
@@ -25,7 +26,7 @@ public class ToolItem : CraftableItem
 
     public List<DamageAgainstTarget> damageValues;
 
-    // Method to get damage against a specific target type
+    
     public float GetDamageAgainst(TargetType targetType)
     {
         foreach (var damageEntry in damageValues)
@@ -48,7 +49,6 @@ public class ToolItem : CraftableItem
 
         if (equippedItemModel != null)
         {
-            // Try to get the Attack component
             Attack attackComponent = equippedItemModel.GetComponent<Attack>();
             if (attackComponent == null)
             {
@@ -57,10 +57,10 @@ public class ToolItem : CraftableItem
                 attackComponent.targetLayer = LayerMask.GetMask("Targets", "NodeLayer");
             }
 
-            // Set the tool item in the Attack component
+           
             attackComponent.toolItem = this;
 
-            // Perform the attack
+            
             attackComponent.PerformAttack();
         }
         else

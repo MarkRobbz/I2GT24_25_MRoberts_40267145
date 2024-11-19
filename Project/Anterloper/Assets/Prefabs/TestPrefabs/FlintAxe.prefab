@@ -181,7 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e70a9173201cf44f8ef42b1cfaa35d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 25
+  toolItem: {fileID: 11400000, guid: d42a5e748fdc68b4c824ee794efb315c, type: 2}
   attackRange: 3
   targetLayer:
     serializedVersion: 2

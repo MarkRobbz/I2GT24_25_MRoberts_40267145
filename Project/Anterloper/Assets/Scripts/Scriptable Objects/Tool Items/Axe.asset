@@ -24,6 +24,7 @@ MonoBehaviour:
     amount: 1
   toolType: 1
   baseDamage: 25
+  attackRate: 0.5
   damageValues:
   - targetType: 1
     damageValue: 25

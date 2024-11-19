@@ -6,6 +6,46 @@ public class Attack : MonoBehaviour
     public float attackRange = 3f; // Range to hit
     public LayerMask targetLayer;
 
+    private float attackCooldown = 0f; // Time remaining until next attack
+    private float attackRate = 1f;     // Attacks per second
+
+    void Start()
+    {
+        // Initialise attack rate from a tool item
+        if (toolItem != null && toolItem.attackRate > 0)
+        {
+            attackRate = toolItem.attackRate;
+        }
+        else
+        {
+            Debug.LogWarning("ToolItem is null or has invalid attackRate. Using default attack rate.");
+        }
+    }
+
+    void Update()
+    {
+        if (attackCooldown > 0f)
+        {
+            attackCooldown -= Time.deltaTime;
+        }
+    }
+
+    
+    public void AttemptAttack()
+    {
+        if (attackCooldown > 0f)
+        {
+            // Cannot attack yet
+            return;
+        }
+
+        PerformAttack();
+
+        // Set cooldown based on tools attack rate
+        attackCooldown = 1f / attackRate;
+    }
+
+    
     public void PerformAttack()
     {
         if (toolItem == null)

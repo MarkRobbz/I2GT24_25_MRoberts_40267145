@@ -124,13 +124,35 @@ public class PlayerController : MonoBehaviour
 
     void HandleEquipmentAction()
     {
-        if (Input.GetKeyDown(_equipmentAction1)) 
+        if (Input.GetKeyDown(_equipmentAction1) || Input.GetKey(_equipmentAction1))
         {
             if (_playerEquipment.equippedItem != null)
             {
                 if (_playerEquipment.equippedItem is ToolItem toolItem)
                 {
-                    toolItem.UseTool();
+                    // Get the player's equipped item model
+                    GameObject equippedItemModel = _playerEquipment.equippedItemModel;
+
+                    if (equippedItemModel != null)
+                    {
+                        // Try to get or add the Attack component
+                        Attack attackComponent = equippedItemModel.GetComponent<Attack>();
+                        if (attackComponent == null)
+                        {
+                            attackComponent = equippedItemModel.AddComponent<Attack>();
+                            attackComponent.targetLayer = LayerMask.GetMask("Targets", "NodeLayer");
+                        }
+
+                        // Set tool item in attack componet
+                        attackComponent.toolItem = toolItem;
+
+                        
+                        attackComponent.AttemptAttack();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("No equipped item model found.");
+                    }
                 }
                 else
                 {
