@@ -3,8 +3,9 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-    public enum EnemyState { Idle, Stalking, Fleeing, Chasing, Attacking }
+    public enum EnemyState { Idle, Stalking, MovingBackwards, Fleeing, Chasing, Attacking }
     public EnemyState currentState = EnemyState.Idle;
+    private EnemyAnimationController _animationController;
 
     public Transform player;
     public float stalkingDistance = 15f; // Distance to stalk player from
@@ -20,17 +21,16 @@ public class EnemyAI : MonoBehaviour
     private DayNightCycle _dayNightCycle;
     private int _daysPassed;
 
-    private Health _health; 
+    private Health _health;
     private Health _playerHealth;
-    
+
     private bool _canAttack = false;
     private bool _decisionMade = false;   // Tracks if the enemy has made a decision after allowed days
-    
-    public int attackAfterDays = 2; //  Easy=4, Medium=2, Hard=0
+
+    public int attackAfterDays = 2; // Number of days after which the enemy can attack
 
     void Start()
     {
-        
         _agent = GetComponent<NavMeshAgent>();
         _dayNightCycle = FindObjectOfType<DayNightCycle>();
 
@@ -43,13 +43,12 @@ public class EnemyAI : MonoBehaviour
         _agent.updatePosition = true;
         _agent.updateRotation = false; // Controlling rotation manually to move backwards facing player
 
-        
-        _health = GetComponent<Health>(); 
+        _health = GetComponent<Health>();
         if (_health == null)
         {
             Debug.LogError("Health component missing on EnemyAI.");
         }
-        
+
         if (player != null)
         {
             _playerHealth = player.GetComponent<Health>();
@@ -62,7 +61,13 @@ public class EnemyAI : MonoBehaviour
         {
             Debug.LogError("Player Transform not assigned in EnemyAI script!");
         }
-        
+
+        _animationController = GetComponentInChildren<EnemyAnimationController>();
+        if (_animationController == null)
+        {
+            Debug.LogError("EnemyAnimationManager component missing!");
+        }
+
         _daysPassed = _dayNightCycle.GetDaysPassed();
         _canAttack = (_daysPassed >= attackAfterDays);
     }
@@ -75,7 +80,7 @@ public class EnemyAI : MonoBehaviour
         if (_health.CurrentHealth <= 0)
         {
             Destroy(gameObject);
-            return; 
+            return;
         }
 
         _attackTimer -= Time.deltaTime;
@@ -117,13 +122,24 @@ public class EnemyAI : MonoBehaviour
                         }
                         else
                         {
-                            currentState = EnemyState.Fleeing;
+                            currentState = EnemyState.MovingBackwards;
                         }
                     }
                     else
                     {
                         StalkPlayer();
                     }
+                }
+                break;
+
+            case EnemyState.MovingBackwards:
+                if (distanceToPlayer > stalkingDistance)
+                {
+                    currentState = EnemyState.Stalking;
+                }
+                else
+                {
+                    MoveBackwards();
                 }
                 break;
 
@@ -174,6 +190,8 @@ public class EnemyAI : MonoBehaviour
         {
             FacePlayer();
         }
+
+        _animationController.UpdateMovementAnimation();
     }
 
     void StalkPlayer()
@@ -188,13 +206,25 @@ public class EnemyAI : MonoBehaviour
         _agent.SetDestination(targetPosition);
     }
 
+    void MoveBackwards()
+    {
+        if (_agent == null || !_agent.isActiveAndEnabled || !_agent.isOnNavMesh)
+        {
+            return;
+        }
+        // Move backwards to maintain distance
+        Vector3 direction = (transform.position - player.position).normalized;
+        Vector3 targetPosition = transform.position + direction * stalkingDistance;
+        _agent.SetDestination(targetPosition);
+    }
+
     void FleeFromPlayer()
     {
         if (_agent == null || !_agent.isActiveAndEnabled || !_agent.isOnNavMesh)
         {
             return;
         }
-        
+
         // Move away from the player to maintain distance
         Vector3 fleeDirection = (transform.position - player.position).normalized;
         Vector3 fleeTarget = transform.position + fleeDirection * fleeDistance;
@@ -264,7 +294,6 @@ public class EnemyAI : MonoBehaviour
         if (_daysPassed >= attackAfterDays)
         {
             _canAttack = true;
-            //*Implement patrolling later*
         }
     }
 
@@ -272,7 +301,6 @@ public class EnemyAI : MonoBehaviour
     {
         Vector3 direction = (player.position - transform.position).normalized;
 
-        //*Change to head movement later*
         // Add slight randomness (creepy factor)
         float lookAwayChance = .05f; // 5% chance each frame
         if (Random.value < lookAwayChance)
@@ -286,7 +314,7 @@ public class EnemyAI : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
         }
     }
-    
+
     private void OnDestroy()
     {
         if (_dayNightCycle != null)
@@ -296,5 +324,4 @@ public class EnemyAI : MonoBehaviour
             _dayNightCycle.OnNewDay -= OnNewDay;
         }
     }
-    
 }
