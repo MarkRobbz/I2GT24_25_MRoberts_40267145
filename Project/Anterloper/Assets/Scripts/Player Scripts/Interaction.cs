@@ -1,6 +1,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 using TMPro;
+using System.Collections;
 
 public class Interaction : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class Interaction : MonoBehaviour
     [SerializeField] private LayerMask _nodeLayer = 1 << 10;
     [SerializeField] private LayerMask _excludedLayers;
     [SerializeField] private TextMeshProUGUI _interactionUI;
-    
+
     [SerializeField] private KeyCode _interactKey = KeyCode.E;
     [SerializeField] private float _holdThreshold = 0.5f; //seconds required to consume
     private float _interactKeyHoldTime = 0f;
@@ -21,12 +22,10 @@ public class Interaction : MonoBehaviour
     [SerializeField] private Inventory _inventory;
 
     private IUsable _currentUsable;
-    private int _frameCount = 0;
-    private int _checkInterval = 10;
+    private bool _showRaycast = false;
 
-    private bool _showRaycast = false;  
-    
     private GameObject _currentInteractableObject;
+    private Transform _playerCameraTransform;
 
     private void Start()
     {
@@ -34,24 +33,21 @@ public class Interaction : MonoBehaviour
         {
             _playerCamera = gameObject.GetComponentInChildren<Camera>();
         }
-        
+
+        _playerCameraTransform = _playerCamera.transform;
+
         _interactionUI = GameObject.FindGameObjectWithTag("InteractPromptUI").GetComponentInChildren<TextMeshProUGUI>();
         _interactionUI.gameObject.SetActive(false);
         _inventory = FindObjectOfType<Inventory>();
-        
+
         int equippedItemLayer = LayerMask.NameToLayer("EquippedItem");
         _excludedLayers = 1 << equippedItemLayer;
+
+        StartCoroutine(DetectInteractableObjectRoutine());
     }
 
     private void Update()
     {
-        _frameCount++;
-        
-        if (_frameCount % _checkInterval == 0)
-        {
-            DetectInteractableObject();
-        }
-        
         HandleInteractionInput();
     }
 
@@ -99,21 +95,28 @@ public class Interaction : MonoBehaviour
         _interactKeyHoldTime = 0f;
         _consumed = false;
     }
-    
+
+    private IEnumerator DetectInteractableObjectRoutine()
+    {
+        while (true)
+        {
+            DetectInteractableObject();
+            yield return new WaitForSeconds(0.1f); // Check every 0.1 seconds
+        }
+    }
+
     private void DetectInteractableObject()
     {
         RaycastHit hit;
-        Vector3 origin = _playerCamera.transform.position;
-        Vector3 direction = _playerCamera.transform.forward;
-        
+        Vector3 origin = _playerCameraTransform.position;
+        Vector3 direction = _playerCameraTransform.forward;
+
         int layerMask = (_interactableLayer | _pickupLayer | _nodeLayer) & ~_excludedLayers;
 
         bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance, layerMask);
 
-       
         if (hitDetected)
         {
-            // Try to get IUsable
             IUsable usable = hit.collider.GetComponentInParent<IUsable>();
 
             if (usable != null)
@@ -175,51 +178,47 @@ public class Interaction : MonoBehaviour
         }
     }
 
-public GameObject GetCurrentInteractableObject()
-{
-    if (_currentUsable != null)
+    public GameObject GetCurrentInteractableObject()
     {
-        return ((MonoBehaviour)_currentUsable).gameObject;
-    }
-    else
-    {
-        //Check if player is looking at a tree
-        RaycastHit hit;
-        Vector3 origin = _playerCamera.transform.position;
-        Vector3 direction = _playerCamera.transform.forward;
-
-        int layerMask = Physics.DefaultRaycastLayers & ~_excludedLayers;
-
-        bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance, layerMask);
-
-        if (hitDetected)
+        if (_currentUsable != null)
         {
-            Tree tree = hit.collider.GetComponentInParent<Tree>();
-            if (tree != null)
+            return ((MonoBehaviour)_currentUsable).gameObject;
+        }
+        else
+        {
+            RaycastHit hit;
+            Vector3 origin = _playerCameraTransform.position;
+            Vector3 direction = _playerCameraTransform.forward;
+
+            int layerMask = Physics.DefaultRaycastLayers & ~_excludedLayers;
+
+            bool hitDetected = Physics.SphereCast(origin, _sphereRadius, direction, out hit, _raycastDistance, layerMask);
+
+            if (hitDetected)
             {
-                return tree.gameObject;
+                Tree tree = hit.collider.GetComponentInParent<Tree>();
+                if (tree != null)
+                {
+                    return tree.gameObject;
+                }
             }
         }
+
+        return null;
     }
 
-    return null;
-}
-
-    
-    //*****EDITOR DEBUG TOOLS****//
-    
     [Button("Toggle Raycast Visualisation")]
     public void ToggleRaycastVisualisation()
     {
         _showRaycast = !_showRaycast;
     }
-    
+
     private void OnDrawGizmos()
     {
         if (_showRaycast)
         {
-            Vector3 origin = _playerCamera.transform.position;
-            Vector3 direction = _playerCamera.transform.forward;
+            Vector3 origin = _playerCameraTransform.position;
+            Vector3 direction = _playerCameraTransform.forward;
 
             Gizmos.color = Color.yellow;
             Gizmos.DrawRay(origin, direction * _raycastDistance);
