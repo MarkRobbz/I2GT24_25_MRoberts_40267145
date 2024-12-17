@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class Tree : MonoBehaviour, IAttackable
 {
@@ -38,14 +39,35 @@ public class Tree : MonoBehaviour, IAttackable
 
         health -= damage;
         Debug.Log($"Tree took {damage} damage, health now {health}");
+        
+        StartCoroutine(ShakeTree(0.1f, 2f)); // Treeshake plaer feedback
 
-        // Update the player's position when taking damage
+        // Update the player's position when taking damage*
         UpdateLastPlayerPosition();
 
         if (health <= 0)
         {
             FellTree();
         }
+    }
+    
+    private IEnumerator ShakeTree(float duration, float magnitude)
+    {
+        Vector3 originalEulerAngles = treeTrunk.transform.localEulerAngles;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float xAngle = originalEulerAngles.x + Random.Range(-1f, 1f) * magnitude;
+            float zAngle = originalEulerAngles.z + Random.Range(-1f, 1f) * magnitude;
+
+            treeTrunk.transform.localEulerAngles = new Vector3(xAngle, originalEulerAngles.y, zAngle);
+            yield return null;
+        }
+
+        // Reset to original rotation
+        treeTrunk.transform.localEulerAngles = originalEulerAngles;
     }
 
     public TargetType GetTargetType()
