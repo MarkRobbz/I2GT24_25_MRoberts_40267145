@@ -2240,7 +2240,7 @@ ParticleSystem:
   m_GameObject: {fileID: 770655273}
   serializedVersion: 8
   lengthInSec: 20
-  simulationSpeed: 1
+  simulationSpeed: 0.1
   stopAction: 0
   cullingMode: 0
   ringBufferMode: 0
@@ -3068,7 +3068,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 45
+      scalar: 30
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -3523,7 +3523,7 @@ ParticleSystem:
         ctime6: 0
         ctime7: 0
         atime0: 0
-        atime1: 32768
+        atime1: 65535
         atime2: 65535
         atime3: 0
         atime4: 0
@@ -3533,7 +3533,7 @@ ParticleSystem:
         m_Mode: 0
         m_ColorSpace: 0
         m_NumColorKeys: 2
-        m_NumAlphaKeys: 3
+        m_NumAlphaKeys: 2
       minGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -7360,6 +7360,8 @@ MonoBehaviour:
   dayLengthInMinutes: 3
   _currentTime: 18
   _daysPassed: 0
+  fogParticleSystem: {fileID: 770655275}
+  isFogActive: 0
 --- !u!4 &885537647
 Transform:
   m_ObjectHideFlags: 0
@@ -13806,6 +13808,7 @@ SceneRoots:
   - {fileID: 297604667}
   - {fileID: 649903818}
   - {fileID: 1309036260}
+  - {fileID: 770655276}
   - {fileID: 2636837673956959764}
   - {fileID: 533659676367645058}
   - {fileID: 298286652232411871}
@@ -13825,4 +13828,3 @@ SceneRoots:
   - {fileID: 4698893}
   - {fileID: 2100205959}
   - {fileID: 2016318936}
-  - {fileID: 770655276}

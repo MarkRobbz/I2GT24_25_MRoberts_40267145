@@ -7,27 +7,30 @@ public class DayNightCycle : MonoBehaviour
     public event Action OnNightStart;
     public event Action OnNewDay;
 
-    [SerializeField] private float dayLengthInMinutes = 1f; 
+    [SerializeField] private float dayLengthInMinutes = 1f;
     [SerializeField] private float _currentTime;
-    
+
     private bool _isDaytime = true;
     [SerializeField] private int _daysPassed = 0;
+
+    [SerializeField] private ParticleSystem fogParticleSystem;
+    [SerializeField] private bool isFogActive;
 
     private void Start()
     {
         _currentTime = 4f; //AM
         Debug.Log("DayNightCycle is active");
+        UpdateFogState();
     }
 
     private void Update()
     {
         UpdateTime();
-        
     }
 
     private void UpdateTime()
     {
-        _currentTime += Time.deltaTime * (24f / (dayLengthInMinutes * 60f)); 
+        _currentTime += Time.deltaTime * (24f / (dayLengthInMinutes * 60f));
         //Debug.Log($"Current Time: {_currentTime}, Is Daytime: {_isDaytime}");
 
         if (_currentTime >= 24f) // A new day
@@ -50,12 +53,12 @@ public class DayNightCycle : MonoBehaviour
         }
     }
 
-
     private void StartDay()
     {
         _isDaytime = true;
         OnDayStart?.Invoke();
         Debug.Log("Day started.");
+        UpdateFogState();
     }
 
     private void StartNight()
@@ -63,6 +66,16 @@ public class DayNightCycle : MonoBehaviour
         _isDaytime = false;
         OnNightStart?.Invoke();
         Debug.Log("Night started.");
+        UpdateFogState();
+    }
+
+    private void UpdateFogState()
+    {
+        if (fogParticleSystem != null)
+        {
+            isFogActive = !_isDaytime;
+            fogParticleSystem.gameObject.SetActive(isFogActive);
+        }
     }
 
     public float GetCurrentTime() => _currentTime;
