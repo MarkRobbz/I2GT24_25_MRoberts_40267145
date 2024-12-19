@@ -21,6 +21,8 @@ public class Tree : MonoBehaviour, IAttackable
     private Vector3 _lastPlayerPosition;
     
     [SerializeField] private AudioClip chopSound;
+    [SerializeField] private AudioClip fallSound;
+    [SerializeField] private AudioClip treeHitGroundSound;
 
     
 
@@ -92,6 +94,7 @@ public class Tree : MonoBehaviour, IAttackable
     }
     private void FellTree()
     {
+        AudioManager.Instance.Play3D(fallSound, transform.position);
         isFallen = true;
         _rigidbody.isKinematic = false; // Let tree trunk fall
         
@@ -120,7 +123,7 @@ public class Tree : MonoBehaviour, IAttackable
             if (collision.gameObject.CompareTag("Ground"))
             {
                 Debug.Log("Tree has hit the ground. Spawning logs.");
-                
+                AudioManager.Instance.Play3D(treeHitGroundSound, transform.position);
                 _collider.enabled = false;
 
                 SpawnLogs();

@@ -162,6 +162,8 @@ MonoBehaviour:
   stump: {fileID: 2331097097887502859}
   treeTrunk: {fileID: 5655303296011730116}
   chopSound: {fileID: 8300000, guid: d4bfcf372ae7ab24eba4f0270f5531fb, type: 3}
+  fallSound: {fileID: 8300000, guid: 8fa7d262f011e364ea21868b73a0599a, type: 3}
+  treeHitGroundSound: {fileID: 8300000, guid: 2ef603aabe0a07a4fbde65e32fe00b47, type: 3}
 --- !u!1 &6256263414505035836
 GameObject:
   m_ObjectHideFlags: 0
