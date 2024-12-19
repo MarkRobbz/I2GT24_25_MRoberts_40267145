@@ -19,6 +19,8 @@ public class Tree : MonoBehaviour, IAttackable
     private Collider _collider;
     private DayNightCycle _dayNightCycle;
     private Vector3 _lastPlayerPosition;
+    
+    [SerializeField] private AudioClip chopSound;
 
     
 
@@ -34,6 +36,7 @@ public class Tree : MonoBehaviour, IAttackable
 
     public void TakeDamage(float damage)
     {
+        AudioManager.Instance.Play3D(chopSound, transform.position);
         if (isFallen)
             return;
 

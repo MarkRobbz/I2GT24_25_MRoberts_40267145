@@ -161,6 +161,7 @@ MonoBehaviour:
   regrowTime: 3
   stump: {fileID: 2331097097887502859}
   treeTrunk: {fileID: 5655303296011730116}
+  chopSound: {fileID: 8300000, guid: d4bfcf372ae7ab24eba4f0270f5531fb, type: 3}
 --- !u!1 &6256263414505035836
 GameObject:
   m_ObjectHideFlags: 0
