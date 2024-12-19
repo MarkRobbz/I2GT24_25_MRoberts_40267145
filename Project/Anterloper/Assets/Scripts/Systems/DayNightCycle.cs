@@ -16,11 +16,26 @@ public class DayNightCycle : MonoBehaviour
     [SerializeField] private ParticleSystem fogParticleSystem;
     [SerializeField] private bool isFogActive;
 
+    
+    [Header("Ambience Clips")]
+    [SerializeField] private AudioClip dayAmbienceClip;
+    [SerializeField] private AudioClip nightAmbienceClip;
+    [SerializeField] private float ambienceVolume = 0.05f;
+
     private void Start()
     {
         _currentTime = 4f; //AM
         Debug.Log("DayNightCycle is active");
         UpdateFogState();
+        
+        if (_isDaytime && dayAmbienceClip != null)
+        {
+            AudioManager.Instance.PlayMusic(dayAmbienceClip, ambienceVolume, true);
+        }
+        else if (!_isDaytime && nightAmbienceClip != null)
+        {
+            AudioManager.Instance.PlayMusic(nightAmbienceClip, ambienceVolume, true);
+        }
     }
 
     private void Update()
@@ -31,8 +46,7 @@ public class DayNightCycle : MonoBehaviour
     private void UpdateTime()
     {
         _currentTime += Time.deltaTime * (24f / (dayLengthInMinutes * 60f));
-        //Debug.Log($"Current Time: {_currentTime}, Is Daytime: {_isDaytime}");
-
+        
         if (_currentTime >= 24f) // A new day
         {
             _currentTime = 0f;
@@ -59,6 +73,12 @@ public class DayNightCycle : MonoBehaviour
         OnDayStart?.Invoke();
         Debug.Log("Day started.");
         UpdateFogState();
+
+        // Play day ambience
+        if (dayAmbienceClip != null)
+        {
+            AudioManager.Instance.PlayMusic(dayAmbienceClip, ambienceVolume, true);
+        }
     }
 
     private void StartNight()
@@ -67,6 +87,12 @@ public class DayNightCycle : MonoBehaviour
         OnNightStart?.Invoke();
         Debug.Log("Night started.");
         UpdateFogState();
+
+        // Play night ambience
+        if (nightAmbienceClip != null)
+        {
+            AudioManager.Instance.PlayMusic(nightAmbienceClip, ambienceVolume, true);
+        }
     }
 
     private void UpdateFogState()
