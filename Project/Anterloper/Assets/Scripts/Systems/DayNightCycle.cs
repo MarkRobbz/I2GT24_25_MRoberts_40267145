@@ -16,7 +16,6 @@ public class DayNightCycle : MonoBehaviour
     [SerializeField] private ParticleSystem fogParticleSystem;
     [SerializeField] private bool isFogActive;
 
-    
     [Header("Ambience Clips")]
     [SerializeField] private AudioClip dayAmbienceClip;
     [SerializeField] private AudioClip nightAmbienceClip;
@@ -24,17 +23,18 @@ public class DayNightCycle : MonoBehaviour
 
     private void Start()
     {
-        _currentTime = 4f; //AM
+        _currentTime = 4f; // Start at 4 AM
         Debug.Log("DayNightCycle is active");
         UpdateFogState();
-        
+
+        // Play appropriate ambience at start
         if (_isDaytime && dayAmbienceClip != null)
         {
-            AudioManager.Instance.PlayMusic(dayAmbienceClip, ambienceVolume, true);
+            AudioManager.Instance.PlayAmbience(dayAmbienceClip, ambienceVolume, true);
         }
         else if (!_isDaytime && nightAmbienceClip != null)
         {
-            AudioManager.Instance.PlayMusic(nightAmbienceClip, ambienceVolume, true);
+            AudioManager.Instance.PlayAmbience(nightAmbienceClip, ambienceVolume, true);
         }
     }
 
@@ -46,7 +46,7 @@ public class DayNightCycle : MonoBehaviour
     private void UpdateTime()
     {
         _currentTime += Time.deltaTime * (24f / (dayLengthInMinutes * 60f));
-        
+
         if (_currentTime >= 24f) // A new day
         {
             _currentTime = 0f;
@@ -55,12 +55,12 @@ public class DayNightCycle : MonoBehaviour
             Debug.Log("New day started");
             if (!_isDaytime) StartDay();
         }
-        else if (_isDaytime && _currentTime >= 18f) // 6 PM
+        else if (_isDaytime && _currentTime >= 18f) // Transition to Night at 6 PM
         {
             Debug.Log("Transition to Night");
             StartNight();
         }
-        else if (!_isDaytime && _currentTime >= 6f && _currentTime < 18f) // 6 AM
+        else if (!_isDaytime && _currentTime >= 6f && _currentTime < 18f) // Transition to Day at 6 AM
         {
             Debug.Log("Transition to Day");
             StartDay();
@@ -77,7 +77,7 @@ public class DayNightCycle : MonoBehaviour
         // Play day ambience
         if (dayAmbienceClip != null)
         {
-            AudioManager.Instance.PlayMusic(dayAmbienceClip, ambienceVolume, true);
+            AudioManager.Instance.PlayAmbience(dayAmbienceClip, ambienceVolume, true);
         }
     }
 
@@ -91,7 +91,7 @@ public class DayNightCycle : MonoBehaviour
         // Play night ambience
         if (nightAmbienceClip != null)
         {
-            AudioManager.Instance.PlayMusic(nightAmbienceClip, ambienceVolume, true);
+            AudioManager.Instance.PlayAmbience(nightAmbienceClip, ambienceVolume, true);
         }
     }
 

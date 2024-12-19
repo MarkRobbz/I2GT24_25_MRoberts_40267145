@@ -7,7 +7,9 @@ public class AudioManager : MonoBehaviour
 
     [Header("Global Audio Sources")]
     [SerializeField] private AudioSource musicSource;
+    [SerializeField] private AudioSource ambienceSource;
     [SerializeField] private AudioSource sfx2DSource;
+    
 
     [Header("Audio Source Pool for 3D Clips")]
     [SerializeField] private GameObject audioSourcePrefab; 
@@ -95,7 +97,15 @@ public class AudioManager : MonoBehaviour
         musicSource.Play();
     }
 
-  
+    public void PlayAmbience(AudioClip ambienceClip, float volume = 1f, bool loop = true)
+    {
+        if (ambienceSource == null || ambienceClip == null) return;
+        ambienceSource.clip = ambienceClip;
+        ambienceSource.volume = volume;
+        ambienceSource.loop = loop;
+        ambienceSource.Play();
+    }
+
     private AudioSource GetAvailableAudioSource()
     {
         // If all sources are in use, reuse the oldest
