@@ -2205,6 +2205,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5fa60f608a914244084a6b01f3b81970, type: 3}
+--- !u!198 &622915228 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 343863053532677767, guid: 1a3ec151ea43d6e42a686a2b21f7ee65,
+    type: 3}
+  m_PrefabInstance: {fileID: 2819332991265509735}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &645722823
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6559,7 +6565,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 213e7618ea0580044a3b8e6d1e3a9611, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentState: 4
+  currentState: 1
   player: {fileID: 649903818}
   stalkingDistance: 15
   fleeDistance: 10
@@ -9238,7 +9244,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: f6b47710edd435246b1b34bed78702fa,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -38.9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f6b47710edd435246b1b34bed78702fa,
         type: 3}
@@ -9248,7 +9254,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: f6b47710edd435246b1b34bed78702fa,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4.3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f6b47710edd435246b1b34bed78702fa,
         type: 3}
@@ -10079,10 +10085,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: FogParticleSystem
       objectReference: {fileID: 0}
+    - target: {fileID: 1042431784325469626, guid: 1a3ec151ea43d6e42a686a2b21f7ee65,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7677985529051642807, guid: 1a3ec151ea43d6e42a686a2b21f7ee65,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5303
+      objectReference: {fileID: 0}
+    - target: {fileID: 7677985529051642807, guid: 1a3ec151ea43d6e42a686a2b21f7ee65,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5303
+      objectReference: {fileID: 0}
+    - target: {fileID: 7677985529051642807, guid: 1a3ec151ea43d6e42a686a2b21f7ee65,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5303
+      objectReference: {fileID: 0}
     - target: {fileID: 7677985529051642807, guid: 1a3ec151ea43d6e42a686a2b21f7ee65,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12.284601
+      value: -3.9
       objectReference: {fileID: 0}
     - target: {fileID: 7677985529051642807, guid: 1a3ec151ea43d6e42a686a2b21f7ee65,
         type: 3}
@@ -10092,7 +10118,7 @@ PrefabInstance:
     - target: {fileID: 7677985529051642807, guid: 1a3ec151ea43d6e42a686a2b21f7ee65,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 14.69
+      value: 24.2
       objectReference: {fileID: 0}
     - target: {fileID: 7677985529051642807, guid: 1a3ec151ea43d6e42a686a2b21f7ee65,
         type: 3}
@@ -10147,6 +10173,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: DayAndNightManager
       objectReference: {fileID: 0}
+    - target: {fileID: 3088637461089453825, guid: 74a9d293381da3b4e9f8a974fcca0980,
+        type: 3}
+      propertyPath: fogParticleSystem
+      value: 
+      objectReference: {fileID: 622915228}
     - target: {fileID: 6911967726850545256, guid: 74a9d293381da3b4e9f8a974fcca0980,
         type: 3}
       propertyPath: m_LocalPosition.x

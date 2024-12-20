@@ -271,16 +271,16 @@ public class EnemyAI : MonoBehaviour
         switch (state)
         {
             case EnemyState.Idle:
-                PlayLooping(IdleSound, 0.03f);
+                PlayLooping(IdleSound, 0.01f);
                 break;
             case EnemyState.Stalking:
-                PlayLooping(StalkingSound, 0.03f);
+                PlayLooping(StalkingSound, 0.01f);
                 break;
             case EnemyState.Fleeing:
-                PlayLooping(FleeingSound, 0.03f);
+                PlayLooping(FleeingSound, 0.01f);
                 break;
             case EnemyState.Chasing:
-                PlayLooping(ChasingSound, 0.03f);
+                PlayLooping(ChasingSound, 0.01f);
                 break;
             case EnemyState.Attacking:
                 // Attacking will be handled as a one-shot sound during the attack action
@@ -349,7 +349,7 @@ public class EnemyAI : MonoBehaviour
 
         if (_attackTimer <= 0f)
         {
-            PlayOneShot(AttackingSound, 0.2f);
+            PlayOneShot(AttackingSound, 0.01f);
 
             if (_playerHealth != null)
             {
@@ -426,7 +426,7 @@ public class EnemyAI : MonoBehaviour
     }
 
     
-    float PlayOneShot(AudioClip clip, float volume = 1f)
+    float PlayOneShot(AudioClip clip, float volume)
     {
         if (clip != null)
         {
@@ -436,7 +436,7 @@ public class EnemyAI : MonoBehaviour
         return 0f;
     }
 
-    void PlayLooping(AudioClip clip, float volume = 1f)
+    void PlayLooping(AudioClip clip, float volume)
     {
         if (clip != null)
         {
