@@ -4352,7 +4352,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 213e7618ea0580044a3b8e6d1e3a9611, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentState: 0
+  currentState: 4
   player: {fileID: 649903818}
   stalkingDistance: 15
   fleeDistance: 10
@@ -4361,6 +4361,12 @@ MonoBehaviour:
   attackDamage: 10
   attackCooldown: 3
   attackAfterDays: 2
+  IdleSound: {fileID: 8300000, guid: 85c058d55a0bc3441b8a96ebc9ba4ee7, type: 3}
+  StalkingSound: {fileID: 8300000, guid: 6f76206821dd3f044bb626e108c59861, type: 3}
+  FleeingSound: {fileID: 8300000, guid: 743abf39de9d23540a4e95d0e6b7a059, type: 3}
+  ChasingSound: {fileID: 8300000, guid: 181128134f131a3499cc068867d7129b, type: 3}
+  AttackingSound: {fileID: 8300000, guid: 87960fe1e9e01614fb12a7e2474fd1f4, type: 3}
+  DeathSound: {fileID: 8300000, guid: c36dadd0ee985bf45857d4f6ab263811, type: 3}
 --- !u!136 &1309036257
 CapsuleCollider:
   m_ObjectHideFlags: 0
