@@ -76,16 +76,19 @@ public class AudioManager : MonoBehaviour
     {
         if (clip == null || parent == null) return;
         AudioSource source = GetAvailableAudioSource();
-        source.transform.SetParent(parent);
-        source.transform.localPosition = Vector3.zero;
+        source.transform.SetParent(transform); // Set to AudioManager immediately
+        source.transform.position = parent.position; // Set position once
+        // No need to follow the parent if we don't re-parent it to them.
+
         source.volume = volume;
-        source.spatialBlend = 1f;     // Full 3D
+        source.spatialBlend = 1f;
         source.loop = false;
         source.clip = clip;
         source.gameObject.SetActive(true);
         source.Play();
         StartCoroutine(DeactivateAfterPlayback(source));
     }
+
 
     public AudioSource Play3DLooping(AudioClip clip, Transform parent, float volume = 1f)
     {
@@ -150,9 +153,18 @@ public class AudioManager : MonoBehaviour
     //Coroutine to deactivate AudioSource after finished playing.
     private System.Collections.IEnumerator DeactivateAfterPlayback(AudioSource source)
     {
-        yield return new WaitUntil(() => !source.isPlaying);
-        source.gameObject.SetActive(false);
-        source.clip = null;
-        source.transform.SetParent(transform);  // Reset parent to AudioManager
+        // Wait until the clip finishes playing or source becomes null
+        while (source != null && source.isPlaying)
+        {
+            yield return null; // Wait a frame and check again
+        }
+
+        // Now we must check again if source is not null
+        if (source != null)
+        {
+            source.gameObject.SetActive(false);
+            source.clip = null;
+            source.transform.SetParent(transform);  // Reset parent to AudioManager
+        }
     }
 }
