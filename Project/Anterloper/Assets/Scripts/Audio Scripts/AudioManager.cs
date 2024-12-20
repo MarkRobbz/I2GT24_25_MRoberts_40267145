@@ -87,6 +87,33 @@ public class AudioManager : MonoBehaviour
         StartCoroutine(DeactivateAfterPlayback(source));
     }
 
+    public AudioSource Play3DLooping(AudioClip clip, Transform parent, float volume = 1f)
+    {
+        // Similar to Play3D but sets loop = true and returns the source
+        AudioSource source = GetAvailableAudioSource();
+        source.transform.SetParent(parent);
+        source.transform.localPosition = Vector3.zero;
+        source.volume = volume;
+        source.spatialBlend = 1f;
+        source.loop = true;
+        source.clip = clip;
+        source.gameObject.SetActive(true);
+        source.Play();
+        return source;
+    }
+    
+    public void StopLoopingAudio(AudioSource source)
+    {
+        if (source != null)
+        {
+            source.Stop();
+            source.clip = null;
+            source.loop = false;
+            source.gameObject.SetActive(false);
+            source.transform.SetParent(transform);
+        }
+    }
+
    
     public void PlayMusic(AudioClip musicClip, float volume = 1f, bool loop = true)
     {
